@@ -24,7 +24,7 @@ object-fit:cover;
 display:block;
 }
 
-/* กล่อง booking */
+/* กล่อง */
 
 .booking-box{
 
@@ -43,7 +43,7 @@ box-shadow:0 8px 20px rgba(0,0,0,0.08);
 
 }
 
-/* แถววันที่ */
+/* วันที่ */
 
 .date-row{
 
@@ -58,8 +58,6 @@ margin-bottom:10px;
 flex:1;
 }
 
-/* label */
-
 label{
 
 font-size:14px;
@@ -71,8 +69,6 @@ display:block;
 margin-bottom:4px;
 
 }
-
-/* input */
 
 input{
 
@@ -88,8 +84,6 @@ font-size:16px;
 box-sizing:border-box;
 
 background:#fafafa;
-
-margin-top:6px;
 
 }
 
@@ -127,7 +121,7 @@ font-weight:600;
 
 }
 
-/* input group */
+/* input */
 
 .input-group{
 
@@ -156,6 +150,32 @@ font-size:17px;
 font-weight:600;
 
 cursor:pointer;
+
+}
+
+/* payment */
+
+.payment{
+
+display:none;
+
+margin-top:20px;
+
+background:#f7f7f7;
+
+padding:20px;
+
+border-radius:14px;
+
+text-align:center;
+
+}
+
+.payment img{
+
+width:220px;
+
+margin-top:10px;
 
 }
 
@@ -198,20 +218,32 @@ cursor:pointer;
 </div>
 
 <div class="input-group">
-<input type="text" placeholder="Your name">
+<input type="text" placeholder="Your name" id="name">
 </div>
 
 <div class="input-group">
-<input type="text" placeholder="Phone number">
+<input type="text" placeholder="Phone number" id="phone">
 </div>
 
 <div class="input-group">
-<input type="text" placeholder="LINE ID">
+<input type="text" placeholder="LINE ID" id="line">
 </div>
 
-<button>
+<button onclick="confirmBooking()">
 Confirm Booking
 </button>
+
+<div class="payment" id="paymentBox">
+
+<h3>Scan to Pay</h3>
+
+<p>Total <b><span id="payAmount">0</span> THB</b></p>
+
+<img src="promptpayQR.png">
+
+<p>After payment please add LINE: <b>Aon.kj</b></p>
+
+</div>
 
 </div>
 
@@ -225,6 +257,14 @@ const checkout = document.getElementById("checkout");
 const nightsText = document.getElementById("nights");
 const priceText = document.getElementById("price");
 
+const payAmount = document.getElementById("payAmount");
+
+/* ป้องกันวันย้อนหลัง */
+
+const today = new Date().toISOString().split("T")[0];
+checkin.min = today;
+checkout.min = today;
+
 function calculate(){
 
 if(!checkin.value || !checkout.value) return;
@@ -236,7 +276,15 @@ const diff = end - start;
 
 const nights = diff / (1000*60*60*24);
 
-if(nights > 0){
+if(nights <= 0){
+
+alert("Check-out must be after Check-in");
+
+checkout.value="";
+
+return;
+
+}
 
 const total = nights * pricePerNight;
 
@@ -244,12 +292,28 @@ nightsText.innerText = nights;
 
 priceText.innerText = total.toLocaleString();
 
-}
+payAmount.innerText = total.toLocaleString();
 
 }
 
 checkin.addEventListener("change",calculate);
 checkout.addEventListener("change",calculate);
+
+function confirmBooking(){
+
+const nights = nightsText.innerText;
+
+if(nights == 0){
+
+alert("Please select check-in and check-out");
+
+return;
+
+}
+
+document.getElementById("paymentBox").style.display="block";
+
+}
 
 </script>
 
