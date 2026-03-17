@@ -60,8 +60,9 @@ margin-bottom:20px;
 input{
 
 width:100%;
+max-width:100%;
 
-padding:18px;
+padding:16px;
 
 margin:10px 0;
 
@@ -72,6 +73,15 @@ font-size:16px;
 
 box-sizing:border-box;
 
+display:block;
+
+}
+
+/* แก้ date input สำหรับ iPhone */
+
+input[type="date"]{
+appearance:none;
+-webkit-appearance:none;
 }
 
 /* ปุ่ม */
@@ -94,6 +104,12 @@ color:white;
 font-size:18px;
 font-weight:600;
 
+cursor:pointer;
+
+}
+
+button:hover{
+opacity:0.9;
 }
 
 </style>
@@ -107,7 +123,6 @@ font-weight:600;
 <div class="hero">
 <img src="room2.PNG">
 </div>
-
 
 <!-- กล่อง booking -->
 
