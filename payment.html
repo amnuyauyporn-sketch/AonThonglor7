@@ -22,7 +22,7 @@ body{
 /* กล่อง */
 .box{
     background:white;
-    margin:-20px auto 20px; /* 🔥 ลดการซ้อน */
+    margin:-20px auto 20px;
     padding:25px 25px 30px;
     border-radius:20px;
     max-width:420px;
@@ -34,7 +34,6 @@ body{
     margin:15px 0 15px;
 }
 
-/* row */
 .row{
     display:flex;
     justify-content:space-between;
@@ -43,19 +42,16 @@ body{
     padding-bottom:8px;
 }
 
-/* item */
 .item{
     width:48%;
     text-align:left;
 }
 
-/* label */
 .label{
     font-size:12px;
     color:#888;
 }
 
-/* value */
 .value{
     font-size:16px;
     color:black;
@@ -66,7 +62,7 @@ body{
 /* QR */
 .qr{
     width:240px;
-    margin:8px auto; /* 🔥 ลดระยะบนล่างครึ่งนึง */
+    margin:8px auto;
 }
 
 /* ปุ่ม */
@@ -79,13 +75,11 @@ body{
     margin-top:10px;
 }
 
-/* ปุ่มหลัก */
 .primary{
     background:black;
     color:white;
 }
 
-/* ปุ่มรอง */
 .secondary{
     background:#eee;
 }
@@ -94,7 +88,8 @@ body{
 .timer{
     margin-top:5px;
     color:red;
-    font-size:14px;
+    font-size:16px;
+    font-weight:bold;
 }
 </style>
 
@@ -102,15 +97,12 @@ body{
 
 <body>
 
-<!-- รูปหัว -->
 <img src="building.PNG" class="header-img">
 
 <div class="box">
 
-<!-- SUMMARY -->
 <div class="summary">
 
-    <!-- แถว 1 -->
     <div class="row">
         <div class="item">
             <div class="label">Check-in</div>
@@ -123,7 +115,6 @@ body{
         </div>
     </div>
 
-    <!-- แถว 2 -->
     <div class="row">
         <div class="item">
             <div class="label">Nights</div>
@@ -138,13 +129,11 @@ body{
 
 </div>
 
-<!-- QR -->
 <img src="qr.png" class="qr">
 <p>Scan to Pay (PromptPay)</p>
 
-<div class="timer">Time left: 10:00</div>
+<div id="timer" class="timer">Time left: 10:00</div>
 
-<!-- ปุ่ม -->
 <a href="checkin.html">
     <button class="btn primary">I've Paid</button>
 </a>
@@ -154,6 +143,32 @@ Refresh QR
 </button>
 
 </div>
+
+<script>
+// 🔥 ตั้งเวลาเริ่มต้น (10 นาที = 600 วินาที)
+let timeLeft = 600;
+
+let timerElement = document.getElementById("timer");
+
+let countdown = setInterval(function(){
+
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+
+    // เติม 0 หน้าเลข
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    timerElement.innerHTML = "Time left: " + minutes + ":" + seconds;
+
+    timeLeft--;
+
+    if(timeLeft < 0){
+        clearInterval(countdown);
+        timerElement.innerHTML = "QR Expired";
+    }
+
+}, 1000);
+</script>
 
 </body>
 </html>
