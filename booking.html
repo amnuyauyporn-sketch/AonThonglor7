@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Book Room - Aon Thonglor 7</title>
+<title>Aon Thonglor 7 Booking</title>
 
 <style>
 
@@ -11,48 +11,70 @@ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 background:#f2f2f2;
 margin:0;
 text-align:center;
+color:#222;
 }
 
 /* รูปด้านบน */
 
 .hero img{
 width:100%;
-max-height:300px;
+height:320px;
 object-fit:cover;
 }
 
 /* ส่วนหัว */
 
-.header{
-padding:25px;
+.section{
+padding:30px 20px 10px;
 }
 
-.header h1{
-font-size:32px;
+h1{
+font-size:38px;
 margin:10px 0;
+font-weight:700;
+}
+
+.subtitle{
+font-size:18px;
+color:#777;
+margin-bottom:18px;
 }
 
 .price{
-font-size:26px;
-font-weight:bold;
-margin-bottom:10px;
+font-size:32px;
+font-weight:700;
+margin-bottom:6px;
 }
 
-/* กล่องจอง */
+.checkin{
+color:#777;
+font-size:18px;
+margin-bottom:15px;
+}
 
-.container{
+.features{
+font-size:17px;
+color:#777;
+margin-bottom:25px;
+}
+
+/* กล่อง booking */
+
+.booking-box{
+background:white;
+width:90%;
 max-width:420px;
 margin:auto;
-background:white;
 padding:25px;
-border-radius:18px;
+border-radius:20px;
 box-shadow:0 10px 25px rgba(0,0,0,0.08);
-margin-bottom:40px;
 }
+
+/* input */
 
 input{
 width:100%;
-padding:14px;
+padding:16px;
 margin:8px 0;
 border-radius:12px;
 border:1px solid #ddd;
@@ -63,27 +85,23 @@ font-size:16px;
 
 button{
 width:100%;
-padding:16px;
-margin-top:15px;
+padding:18px;
+margin-top:14px;
 border:none;
-border-radius:14px;
+border-radius:16px;
 background:black;
 color:white;
-font-size:18px;
+font-size:20px;
 font-weight:600;
-cursor:pointer;
-}
-
-button:hover{
-opacity:0.9;
 }
 
 .status{
 margin-top:15px;
-font-weight:bold;
+font-weight:600;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -91,84 +109,56 @@ font-weight:bold;
 <!-- รูป -->
 
 <div class="hero">
-<img src="room2.PNG">
+<img src="room1.PNG">
 </div>
 
-<!-- หัว -->
+<!-- text -->
 
-<div class="header">
+<div class="section">
 
 <h1>Aon Thonglor 7</h1>
+
+<div class="subtitle">
+Boutique Room in Thonglor • Bangkok
+</div>
 
 <div class="price">
 1500 THB / Night
 </div>
 
+<div class="checkin">
+Self Check-in 24 Hours
 </div>
 
-<!-- ฟอร์มจอง -->
+<div class="features">
+Free WiFi • Aircon • Hot Shower • Fridge • Microwave
+</div>
 
-<div class="container">
+</div>
+
+<!-- booking -->
+
+<div class="booking-box">
 
 <input type="date" id="checkin">
+
 <input type="date" id="checkout">
 
-<input type="text" id="name" placeholder="Your Name">
-<input type="text" id="phone" placeholder="Phone">
-<input type="text" id="line" placeholder="LINE ID">
+<input type="text" placeholder="Your Name">
 
-<button onclick="bookRoom()">Confirm Booking</button>
+<input type="text" placeholder="Phone">
 
-<div class="status" id="status"></div>
+<input type="text" placeholder="LINE ID">
+
+<button>
+Confirm Booking
+</button>
+
+<div class="status"></div>
 
 </div>
 
-<script>
-
-const api="https://script.google.com/macros/s/AKfycbyxeDGAOHYKrp7SxKj2ST356D2IQ1K0kKbV6yxtOri3wCYJrVHe2y5c9EhycKV_iDRU/exec";
-
-function bookRoom(){
-
-let checkin=document.getElementById("checkin").value;
-let checkout=document.getElementById("checkout").value;
-let name=document.getElementById("name").value;
-let phone=document.getElementById("phone").value;
-let line=document.getElementById("line").value;
-
-if(!checkin || !checkout || !name){
-document.getElementById("status").innerHTML="Please fill required fields";
-return;
-}
-
-fetch(api,{
-method:"POST",
-body:JSON.stringify({
-checkin:checkin,
-checkout:checkout,
-name:name,
-phone:phone,
-line:line
-})
-})
-.then(res=>res.text())
-.then(data=>{
-
-if(data=="FULL"){
-document.getElementById("status").innerHTML="❌ Room Full";
-}
-
-if(data=="BOOKED"){
-document.getElementById("status").innerHTML="✅ Booking Confirmed";
-}
-
-})
-.catch(err=>{
-document.getElementById("status").innerHTML="Error connecting server";
-});
-
-}
-
-</script>
+<br><br>
 
 </body>
 </html>
