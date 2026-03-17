@@ -31,27 +31,15 @@ display:block;
 width:92%;
 max-width:520px;
 
-margin:0 auto 60px auto;
+margin:-30px auto 60px auto;
 
 background:white;
 
-padding:30px;
+padding:25px;
 
-border-radius:20px 20px 0 0;
+border-radius:20px;
 
-box-shadow:0 -5px 20px rgba(0,0,0,0.08);
-
-}
-
-/* หัวข้อ */
-
-.booking-title{
-
-text-align:center;
-font-size:24px;
-font-weight:700;
-
-margin-bottom:25px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
 
 }
 
@@ -60,17 +48,14 @@ margin-bottom:25px;
 .date-row{
 
 display:flex;
-
-gap:12px;
+gap:10px;
 
 }
 
 /* กล่องวันที่ */
 
 .date-field{
-
 flex:1;
-
 }
 
 /* label */
@@ -83,11 +68,11 @@ color:#444;
 
 display:block;
 
-margin-top:12px;
+margin-top:10px;
 
 }
 
-/* input ปกติ */
+/* input */
 
 input{
 
@@ -108,7 +93,7 @@ background:#fafafa;
 
 }
 
-/* ช่องปฏิทินให้เล็ก */
+/* ช่องปฏิทิน */
 
 input[type="date"]{
 
@@ -120,6 +105,22 @@ font-size:14px;
 
 }
 
+/* กล่องสรุป */
+
+.summary{
+
+margin-top:15px;
+
+background:#f7f7f7;
+
+padding:15px;
+
+border-radius:12px;
+
+font-size:15px;
+
+}
+
 /* ปุ่ม */
 
 button{
@@ -128,7 +129,7 @@ width:100%;
 
 padding:18px;
 
-margin-top:20px;
+margin-top:18px;
 
 border:none;
 
@@ -139,8 +140,6 @@ color:white;
 
 font-size:18px;
 font-weight:600;
-
-cursor:pointer;
 
 }
 
@@ -156,22 +155,23 @@ cursor:pointer;
 
 <div class="booking-box">
 
-<div class="booking-title">
-Booking - Aon Thonglor 7
-</div>
-
 <div class="date-row">
 
 <div class="date-field">
 <label>Check-in</label>
-<input type="date">
+<input type="date" id="checkin">
 </div>
 
 <div class="date-field">
 <label>Check-out</label>
-<input type="date">
+<input type="date" id="checkout">
 </div>
 
+</div>
+
+<div class="summary">
+<div>Night: <span id="nights">0</span></div>
+<div>Total Price: <span id="price">0</span> บาท</div>
 </div>
 
 <label>Your Name</label>
@@ -188,6 +188,44 @@ Confirm Booking
 </button>
 
 </div>
+
+<script>
+
+const pricePerNight = 1500;
+
+const checkin = document.getElementById("checkin");
+const checkout = document.getElementById("checkout");
+
+const nightsText = document.getElementById("nights");
+const priceText = document.getElementById("price");
+
+function calculate(){
+
+const start = new Date(checkin.value);
+const end = new Date(checkout.value);
+
+if(checkin.value && checkout.value){
+
+const diff = end - start;
+
+const nights = diff / (1000*60*60*24);
+
+if(nights > 0){
+
+nightsText.innerText = nights;
+
+priceText.innerText = nights * pricePerNight;
+
+}
+
+}
+
+}
+
+checkin.addEventListener("change",calculate);
+checkout.addEventListener("change",calculate);
+
+</script>
 
 </body>
 </html>
