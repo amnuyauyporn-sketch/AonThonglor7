@@ -23,14 +23,14 @@ body{
     z-index:-2;
 }
 
-/* 🔥 overlay ให้ดู soft */
-.overlay{
+/* 🔥 ไล่เงาด้านล่าง (ไม่ทำให้ภาพซีด) */
+.fade{
     position:fixed;
-    top:0;
+    bottom:0;
     left:0;
     width:100%;
-    height:100%;
-    background:rgba(255,255,255,0.75);
+    height:50%;
+    background:linear-gradient(to top, rgba(255,255,255,0.9), rgba(255,255,255,0));
     z-index:-1;
 }
 
@@ -40,7 +40,7 @@ body{
     display:flex;
     align-items:flex-end;
     justify-content:center;
-    padding:20px;
+    padding:40px 20px 80px; /* 👈 ดันขึ้น */
 }
 
 /* card */
@@ -50,7 +50,7 @@ body{
     background:white;
     border-radius:22px;
     padding:26px;
-    box-shadow:0 20px 40px rgba(0,0,0,0.1);
+    box-shadow:0 20px 40px rgba(0,0,0,0.12);
 }
 
 /* title */
@@ -120,7 +120,7 @@ button{
 <body>
 
 <div class="bg"></div>
-<div class="overlay"></div>
+<div class="fade"></div>
 
 <div class="container">
 
