@@ -2,29 +2,40 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Aon Thonglor 7</title>
+<title>Book Room - Aon Thonglor 7</title>
 
 <style>
 
 body{
-font-family: Arial;
-background:#f4f6f8;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+background:#f2f2f2;
+margin:0;
 text-align:center;
-padding:30px;
 }
 
-/* รูปหัวโรงแรม */
-
-.hero{
-max-width:900px;
-margin:auto;
-margin-bottom:25px;
-}
+/* รูปด้านบน */
 
 .hero img{
 width:100%;
-border-radius:18px;
-box-shadow:0 10px 30px rgba(0,0,0,0.15);
+max-height:300px;
+object-fit:cover;
+}
+
+/* ส่วนหัว */
+
+.header{
+padding:25px;
+}
+
+.header h1{
+font-size:32px;
+margin:10px 0;
+}
+
+.price{
+font-size:26px;
+font-weight:bold;
+margin-bottom:10px;
 }
 
 /* กล่องจอง */
@@ -33,50 +44,38 @@ box-shadow:0 10px 30px rgba(0,0,0,0.15);
 max-width:420px;
 margin:auto;
 background:white;
-padding:30px;
-border-radius:16px;
-box-shadow:0 10px 25px rgba(0,0,0,0.1);
-}
-
-h1{
-margin-bottom:5px;
-}
-
-.price{
-font-size:28px;
-font-weight:bold;
-margin-bottom:20px;
-}
-
-small{
-font-size:14px;
-color:#666;
+padding:25px;
+border-radius:18px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+margin-bottom:40px;
 }
 
 input{
 width:100%;
-padding:12px;
+padding:14px;
 margin:8px 0;
-border-radius:10px;
+border-radius:12px;
 border:1px solid #ddd;
 font-size:16px;
 }
 
+/* ปุ่ม */
+
 button{
 width:100%;
-padding:14px;
+padding:16px;
 margin-top:15px;
 border:none;
-border-radius:12px;
-background:#2ecc71;
+border-radius:14px;
+background:black;
 color:white;
 font-size:18px;
-font-weight:bold;
+font-weight:600;
 cursor:pointer;
 }
 
 button:hover{
-background:#27ae60;
+opacity:0.9;
 }
 
 .status{
@@ -89,21 +88,27 @@ font-weight:bold;
 
 <body>
 
-<!-- รูปห้อง -->
+<!-- รูป -->
 
 <div class="hero">
-<img src="room2.png">
+<img src="room2.PNG">
 </div>
 
-<!-- กล่องจอง -->
+<!-- หัว -->
 
-<div class="container">
+<div class="header">
 
 <h1>Aon Thonglor 7</h1>
 
 <div class="price">
-1500 <small>THB / night</small>
+1500 THB / Night
 </div>
+
+</div>
+
+<!-- ฟอร์มจอง -->
+
+<div class="container">
 
 <input type="date" id="checkin">
 <input type="date" id="checkout">
@@ -112,7 +117,7 @@ font-weight:bold;
 <input type="text" id="phone" placeholder="Phone">
 <input type="text" id="line" placeholder="LINE ID">
 
-<button onclick="bookRoom()">Book Room</button>
+<button onclick="bookRoom()">Confirm Booking</button>
 
 <div class="status" id="status"></div>
 
