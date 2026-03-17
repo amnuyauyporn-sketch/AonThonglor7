@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Checking Payment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+    margin:0;
+    font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* background */
+.bg{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:url('checkin2.PNG') center/cover no-repeat;
+}
+
+/* overlay */
+.overlay{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,0.25);
+}
+
+/* layout */
+.container{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    padding:40px 20px 80px;
+}
+
+/* card */
+.card{
+    width:100%;
+    max-width:420px;
+    background:white;
+    border-radius:24px;
+    padding:36px 28px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.15);
+
+    min-height:260px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+/* text */
+h2{
+    text-align:center;
+    margin:0;
+}
+
+p{
+    text-align:center;
+    color:#777;
+    margin-top:10px;
+}
+
+/* loader */
+.loader{
+    border:4px solid #eee;
+    border-top:4px solid black;
+    border-radius:50%;
+    width:50px;
+    height:50px;
+    margin:30px auto;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    0%{transform:rotate(0);}
+    100%{transform:rotate(360deg);}
+}
+
+/* note */
+.note{
+    text-align:center;
+    font-size:13px;
+    color:#aaa;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="bg"></div>
+<div class="overlay"></div>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Checking Payment...</h2>
+
+<p>Please wait while we verify your transfer</p>
+
+<div class="loader"></div>
+
+<p class="note">Do not close this page</p>
+
+</div>
+
+</div>
+
+<script>
+
+/* 🔥 เช็คทุก 3 วิ */
+setInterval(function(){
+
+    console.log("checking payment...");
+
+    // TODO: ต่อ API จริงตรงนี้
+
+    // 🔥 จำลอง success
+    if(Date.now() % 9000 < 3000){
+        window.location.href = "checkin.html";
+    }
+
+},3000);
+
+</script>
+
+</body>
+</html>
