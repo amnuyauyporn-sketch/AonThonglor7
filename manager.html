@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel - Aon Thonglor 7</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background:#f5f5f5;
+    text-align:center;
+}
+
+/* รูปหัว */
+.header-img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+/* กล่อง */
+.box{
+    background:white;
+    margin:-20px auto 20px;
+    padding:25px 25px 30px;
+    border-radius:20px;
+    max-width:420px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+h2{
+    margin-top:0;
+    font-size:22px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Section */
+.section {
+    margin-bottom: 25px;
+    text-align: left;
+    background: #fafafa;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.section-title {
+    font-size: 14px;
+    color: #555;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Price Input Group */
+.price-group {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.price-group input {
+    width: 60%;
+    border: none;
+    padding: 12px;
+    font-size: 18px;
+    text-align: right;
+    outline: none;
+}
+
+.price-group .fixed-unit {
+    width: 40%;
+    background: #eee;
+    padding: 12px;
+    font-size: 18px;
+    color: #666;
+    text-align: left;
+    border-left: 1px solid #ccc;
+    font-weight: bold;
+}
+
+/* Select Dropdown */
+select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: white;
+    margin-bottom: 10px;
+}
+
+/* ปุ่ม */
+.btn{
+    width:100%;
+    padding:14px;
+    font-size:16px;
+    font-weight: bold;
+    border:none;
+    border-radius:10px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.primary{
+    background:black;
+    color:white;
+}
+
+.danger{
+    background: #d32f2f;
+    color: white;
+}
+
+.line-btn{
+    background: #06C755;
+    color: white;
+    margin-bottom: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<img src="building.PNG" class="header-img">
+
+<div class="box">
+    <h2>Admin Control Panel</h2>
+
+    <div class="section">
+        <div class="section-title">1. ตั้งค่าราคาห้องพัก (บาท)</div>
+        <div class="price-group">
+            <input type="number" id="basePrice" placeholder="เช่น 150" step="1">
+            <div class="fixed-unit">X.XX</div>
+        </div>
+        <button class="btn primary" onclick="updatePrice()" style="margin-top: 15px;">💾 บันทึกราคาใหม่</button>
+    </div>
+
+    <div class="section">
+        <div class="section-title">2. จัดการคิวจองห้อง</div>
+        <select id="bookingList">
+            <option value="">กำลังโหลดคิวจอง...</option>
+            </select>
+        <button class="btn danger" onclick="cancelBooking()">❌ ยกเลิกการจอง</button>
+    </div>
+
+    <div class="section">
+        <div class="section-title">3. แจ้งเตือนทีมงาน</div>
+        <a href="https://line.me/R/msg/text/?แม่บ้าน" style="text-decoration:none;">
+            <button class="btn line-btn">🧹 เรียกแม่บ้าน</button>
+        </a>
+        <a href="https://line.me/R/msg/text/?ซักผ้า" style="text-decoration:none;">
+            <button class="btn line-btn">🧺 ส่งซักผ้า</button>
+        </a>
+    </div>
+
+</div>
+
+<script>
+// --- ส่วนของระบบหลังบ้าน (ต้องอัปเดต Apps Script อีกที) ---
+
+function updatePrice() {
+    const price = document.getElementById("basePrice").value;
+    if(!price || price < 1) {
+        alert("กรุณาใส่ตัวเลขราคาที่ถูกต้องค่ะ");
+        return;
+    }
+    const finalPrice = price + "X.XX";
+    // เดี๋ยวเราจะเขียน fetch() เพื่อส่งค่า finalPrice นี้ไปเซฟใน Sheets
+    alert("กำลังเตรียมส่งข้อมูลราคา: " + finalPrice + " ไปที่ Sheets");
+}
+
+function cancelBooking() {
+    const selected = document.getElementById("bookingList").value;
+    if(!selected) {
+        alert("กรุณาเลือกคิวที่ต้องการยกเลิกค่ะ");
+        return;
+    }
+    // เดี๋ยวเราจะเขียน fetch() เพื่อส่ง ID การจองไปเปลี่ยนสถานะใน Sheets เป็น 'cancel'
+    alert("กำลังเตรียมส่งคำสั่งยกเลิกคิวนี้");
+}
+
+// โค้ดสำหรับดึงรายชื่อคนจองมาแสดงใน Dropdown จะเขียนเพิ่มหลังจากเราปรับ Apps Script ค่ะ
+</script>
+
+</body>
+</html>
