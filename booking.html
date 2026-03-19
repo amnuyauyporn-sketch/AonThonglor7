@@ -136,7 +136,6 @@ const inputLine = document.getElementById("line");
 function showAlert(msgEng, msgThai){
   alert(msgEng + "\n" + msgThai);
 }
-
 function validatePhone(phone){
   const phoneRegex = /^[0-9]{10}$/;
   return phoneRegex.test(phone.trim());
@@ -167,63 +166,55 @@ const today = new Date().toISOString().split("T")[0];
 checkin.min = today;
 checkout.min = today;
 
-// --- Calculate ---
-function calculate(){
-  nightsText.innerText = 0;
-  priceText.innerText = 0;
-
-  if(!checkin.value || !checkout.value) return;
-
+// --- Check Dates ---
+function checkDates(){
+  if(!checkin.value || !checkout.value) return false;
   const start = new Date(checkin.value + 'T00:00:00');
   const end = new Date(checkout.value + 'T00:00:00');
-  const diff = Math.round((end - start)/(1000*60*60*24));
 
-  if(diff > 0){
-    nightsText.innerText = diff;
-    priceText.innerText = (diff*pricePerNight).toLocaleString();
-  } else {
-    nightsText.innerText = 0;
-    priceText.innerText = 0;
-  }
-}
-
-checkin.addEventListener("input", calculate);
-checkout.addEventListener("input", calculate);
-checkin.addEventListener("change", calculate);
-checkout.addEventListener("change", calculate);
-
-// --- Confirm Booking ---
-function confirmBooking(){
-  calculate(); // update คืน + ราคา
-
-  // ตรวจวัน
-  if(!checkin.value || !checkout.value){
-    showAlert("Please select check-in and check-out","กรุณาเลือกวันเช็คอิน/เช็คเอาท์");
-    return;
-  }
-
-  const start = new Date(checkin.value + 'T00:00:00');
-  const end = new Date(checkout.value + 'T00:00:00');
-  const diff = Math.round((end-start)/(1000*60*60*24));
-
-  if(diff < 1){
-    // วันผิด → เคลียร์ input ทั้งสอง
+  // เช็คเอาท์ก่อนเช็คอิน
+  if(end <= start){
     checkin.value = "";
     checkout.value = "";
     nightsText.innerText = 0;
     priceText.innerText = 0;
     showAlert("Check-out must be after Check-in","กรุณาเลือกวันเช็คเอาท์หลังเช็คอิน");
-    return;
+    return false;
   }
 
+  // เช็ควันซ้ำ bookedDates
   if(isRangeBlocked(start,end)){
     checkin.value = "";
     checkout.value = "";
     nightsText.innerText = 0;
     priceText.innerText = 0;
     showAlert("Some dates are not available","วันที่เลือกมีผู้จองแล้ว");
-    return;
+    return false;
   }
+
+  return true; // วันถูก
+}
+
+// --- Calculate ---
+function calculate(){
+  nightsText.innerText = 0;
+  priceText.innerText = 0;
+  if(!checkDates()) return;
+
+  const start = new Date(checkin.value + 'T00:00:00');
+  const end = new Date(checkout.value + 'T00:00:00');
+  const diff = Math.round((end - start)/(1000*60*60*24));
+
+  nightsText.innerText = diff;
+  priceText.innerText = (diff*pricePerNight).toLocaleString();
+}
+
+checkin.addEventListener("change", calculate);
+checkout.addEventListener("change", calculate);
+
+// --- Confirm Booking ---
+function confirmBooking(){
+  if(!checkDates()) return;
 
   // ตรวจ input
   if(inputName.value.trim() === ""){
