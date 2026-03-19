@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+</head>
+<body style="text-align:center; font-family:sans-serif; padding-top:50px;">
+    <h2>Payment Detail</h2>
+    <div id="display-area">
+        <p>Checking status...</p>
+    </div>
+    <hr>
+    <a href="index.html" style="display:inline-block; padding:10px 20px; background:#000; color:#fff; text-decoration:none; border-radius:5px;">Back to Home</a>
+
+    <script>
+    const dataStr = localStorage.getItem("pendingBooking");
+    const area = document.getElementById("display-area");
+
+    if (dataStr) {
+        try {
+            const booking = JSON.parse(dataStr);
+            const d = new Date(booking.checkin);
+            const dayStr = String(d.getDate()).padStart(2, '0'); 
+            const finalPrice = "1251." + dayStr; 
+            const qrUrl = "https://promptpay.io/0907980860/" + finalPrice + ".png";
+
+            area.innerHTML = `
+                <h1 style="font-size:40px;">${finalPrice} THB</h1>
+                <img src="${qrUrl}" style="width:100%; max-width:300px; border:1px solid #ccc; margin:20px 0;">
+                <p>Check-in: <b>${booking.checkin}</b></p>
+                <p style="color:red; font-weight:bold;">Please transfer exactly ${finalPrice}</p>
+            `;
+        } catch (e) {
+            area.innerHTML = "<h1>Data Error: Please go back and try again.</h1>";
+        }
+    } else {
+        area.innerHTML = "<h1>No Booking Found. Please start over.</h1>";
+    }
+    </script>
+</body>
+</html>
