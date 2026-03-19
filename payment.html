@@ -1,60 +1,66 @@
-<script>
-// วางลิงก์ Apps Script ของพี่ตรงนี้
-const googleAppsScriptURL = "https://script.google.com/macros/s/AKfycbxH7We7B-LdO6zwQ30LPgOxHIRmv0907-At52vBUtutkaNUBZHNs0XlW7oZMGSnkVCq/exec";
-
-// ...โค้ดส่วนอื่นๆ ที่เจนนี่เคยให้ไป...
+<<script>
+// 1. ดึงข้อมูลที่ส่งมาจากหน้า Index
 const storedData = localStorage.getItem("pendingBooking");
 
 if (storedData) {
     const bookingData = JSON.parse(storedData);
     
-    // 1. ลอจิกของบอสอ้น: 125 + เลขห้อง + . + วันที่
-    const roomNumber = "1"; // สมมติว่าห้อง 1 (เดี๋ยวค่อยทำตัวเลือกห้องทีหลัง)
-    const checkinDate = new Date(bookingData.checkin).getDate(); // ดึงวันที่ เช่น 19
-    const dayStr = String(checkinDate).padStart(2, '0'); // ทำให้เป็น 19
+    // --- ลอจิกราคาของบอสอ้น (125 + เลขห้อง + . + วันที่) ---
+    // ดึงวันที่เช็คอิน (เช่น 19)
+    const checkinDate = new Date(bookingData.checkin).getDate();
+    const dayStr = String(checkinDate).padStart(2, '0'); 
     
-    // รวมร่างเป็นราคา: 125 + 1 + .19 = 1251.19
-    const finalPrice = "125" + roomNumber + "." + dayStr;
+    // สมมติว่าเป็นห้อง 1 (หรือบอสจะแก้เป็นเลขอื่นตามต้องการ)
+    const roomNum = "1"; 
     
-    // 2. เจน QR Code อัตโนมัติจาก PromptPay.io
-    // ใส่เบอร์พร้อมเพย์ของพี่อ้นแทนที่ 0907980860 นะคะ
+    // รวมร่างราคา: 125 + 1 + . + 19 = 1251.19
+    const finalPrice = "125" + roomNum + "." + dayStr;
+    
+    // 2. เจน QR Code อัตโนมัติ (ใส่เบอร์พร้อมเพย์บอสตรงนี้)
     const myPromptPay = "0907980860"; 
     const qrUrl = `https://promptpay.io/${myPromptPay}/${finalPrice}.png`;
     
-    // แสดงผลบนหน้าจอ
-    document.getElementById("val-total").innerText = finalPrice + " THB";
-    document.querySelector(".qr").src = qrUrl; // เปลี่ยนรูป QR เป็นของใหม่ที่มีราคา
+    // 3. แสดงผลบนหน้าจอ (เช็ก ID ให้ตรงกับ HTML ของบอสด้วยนะ)
+    if(document.getElementById("val-total")) document.getElementById("val-total").innerText = finalPrice + " THB";
+    if(document.querySelector(".qr")) document.querySelector(".qr").src = qrUrl;
 
-    // แปลงวันที่โชว์ (เหมือนเดิม)
+    // แปลงวันที่โชว์สวยๆ
     function formatDisplayDate(dateStr) {
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const d = new Date(dateStr);
         return d.getDate() + " " + months[d.getMonth()];
     }
-    document.getElementById("val-checkin").innerText = formatDisplayDate(bookingData.checkin);
-    document.getElementById("val-checkout").innerText = formatDisplayDate(bookingData.checkout);
-    document.getElementById("val-nights").innerText = bookingData.nights;
+    
+    if(document.getElementById("val-checkin")) document.getElementById("val-checkin").innerText = formatDisplayDate(bookingData.checkin);
+    if(document.getElementById("val-checkout")) document.getElementById("val-checkout").innerText = formatDisplayDate(bookingData.checkout);
+    if(document.getElementById("val-nights")) document.getElementById("val-nights").innerText = bookingData.nights;
 
-    // อัปเดตข้อมูลที่จะส่งไป Sheets ให้มีเลขห้องและยอดเงินที่ตรงกันด้วย
+    // อัปเดตข้อมูลกลับไปในเครื่อง เผื่อกดส่งแจ้งโอน
     bookingData.totalPrice = finalPrice;
-    bookingData.roomNumber = roomNumber;
     localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
 
-    // --- ระบบนาฬิกานับถอยหลัง (เหมือนเดิม) ---
+    // --- ระบบนาฬิกานับถอยหลัง 10 นาที ---
     const bookingTime = new Date(bookingData.timestamp).getTime();
     const expireTime = bookingTime + (10 * 60 * 1000);
     const timerElement = document.getElementById("timer");
-    let countdown = setInterval(function(){
-        const now = new Date().getTime();
-        const distance = expireTime - now;
-        if(distance < 0){
-            clearInterval(countdown);
-            timerElement.innerHTML = "QR Expired";
-            return;
-        }
-        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        timerElement.innerHTML = "Time left: " + minutes + ":" + (seconds < 10 ? "0"+seconds : seconds);
-    }, 1000);
+    
+    if(timerElement) {
+        let countdown = setInterval(function(){
+            const now = new Date().getTime();
+            const distance = expireTime - now;
+            if(distance < 0){
+                clearInterval(countdown);
+                timerElement.innerHTML = "QR Expired";
+                return;
+            }
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            timerElement.innerHTML = "Time left: " + minutes + ":" + (seconds < 10 ? "0"+seconds : seconds);
+        }, 1000);
+    }
+} else {
+    // ถ้าไม่มีข้อมูล ให้เด้งกลับไปหน้าแรก
+    window.location.href = "index.html";
 }
 </script>
+
