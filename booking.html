@@ -233,9 +233,11 @@ function confirmBooking(){
 
   if(nightsText.innerText == 0){
     errorMsg.textContent = "Check-out must be after Check-in"; // ถ้าเลือกวันแล้วแต่ผิดลำดับ
-    return;
   }
 
+  // Redirect ไปหน้า payment.html
+  window.location.href = "payment.html";
+}
   document.getElementById("paymentBox").style.display="block";
 }
 </script>
