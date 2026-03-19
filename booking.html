@@ -78,15 +78,6 @@ button{
   font-weight:600;
   cursor:pointer;
 }
-.payment{
-  display:none;
-  margin-top:20px;
-  background:#f7f7f7;
-  padding:20px;
-  border-radius:14px;
-  text-align:center;
-}
-.payment img{ width:220px; margin-top:10px; }
 #errorMsg {
   color:red;
   margin-top:8px;
@@ -97,63 +88,46 @@ button{
 <body>
 
 <div class="hero">
-<img src="room2.PNG">
+<img src="room2.PNG" alt="Room">
 </div>
 
 <div class="booking-box">
 
 <div class="date-row">
-<div class="date-field">
-<label>Check-in</label>
-<input type="date" id="checkin">
-</div>
-<div class="date-field">
-<label>Check-out</label>
-<input type="date" id="checkout">
-</div>
+  <div class="date-field">
+    <label>Check-in</label>
+    <input type="date" id="checkin">
+  </div>
+  <div class="date-field">
+    <label>Check-out</label>
+    <input type="date" id="checkout">
+  </div>
 </div>
 
 <div id="errorMsg"></div>
 
 <div class="summary">
-<div>
-<span id="nights">0</span> Nights
-</div>
-<div>
-<span id="price">0</span> THB
-</div>
+  <div><span id="nights">0</span> Nights</div>
+  <div><span id="price">0</span> THB</div>
 </div>
 
 <div class="input-group">
-<input type="text" placeholder="Your name" id="name">
+  <input type="text" placeholder="Your name" id="name">
 </div>
-
 <div class="input-group">
-<input type="text" placeholder="Phone number" id="phone">
+  <input type="text" placeholder="Phone number" id="phone">
 </div>
-
 <div class="input-group">
-<input type="text" placeholder="LINE ID" id="line">
+  <input type="text" placeholder="LINE ID" id="line">
 </div>
 
-<button onclick="confirmBooking()">
-Confirm Booking
-</button>
-
-<div class="payment" id="paymentBox">
-<h3>Scan to Pay</h3>
-<p>Total <b><span id="payAmount">0</span> THB</b></p>
-<img src="promptpayQR.png">
-<p>After payment please add LINE: <b>Aon.kj</b></p>
-</div>
+<button onclick="confirmBooking()">Confirm Booking</button>
 
 </div>
 
 <script>
-// วันจองที่ถูกจองแล้ว (ดึงจาก Google Sheet หรือ API)
+// วันถูกจองแล้วจาก Google Sheet / API
 let bookedDates = [];
-
-// โหลดวันจองจาก Google Sheet
 async function loadBookedDates(){
   try{
     const res = await fetch("https://script.google.com/macros/s/AKfycbwxKIMgfK8VQbQw3OtH2W29HcSx94SeUv_8NygBVr02jbzkuCW4Y37Xabm52AZXUEat/exec");
@@ -162,7 +136,6 @@ async function loadBookedDates(){
 }
 loadBookedDates();
 
-// ตรวจสอบว่าช่วงวันที่เลือกมีวันถูกจองแล้วหรือไม่
 function isRangeBlocked(start, end){
   let current = new Date(start);
   while(current < end){
@@ -178,7 +151,6 @@ const checkin = document.getElementById("checkin");
 const checkout = document.getElementById("checkout");
 const nightsText = document.getElementById("nights");
 const priceText = document.getElementById("price");
-const payAmount = document.getElementById("payAmount");
 const errorMsg = document.getElementById("errorMsg");
 
 // ป้องกันวันย้อนหลัง
@@ -186,39 +158,37 @@ const today = new Date().toISOString().split("T")[0];
 checkin.min = today;
 checkout.min = today;
 
-// คำนวณราคาและจำนวนคืน
+// คำนวณคืนและราคา
 function calculate(){
   errorMsg.textContent = '';
   nightsText.innerText = 0;
   priceText.innerText = 0;
-  payAmount.innerText = 0;
 
   if(!checkin.value || !checkout.value) return;
 
-  // Normalize เวลาเป็นเที่ยงคืน
   const start = new Date(checkin.value + 'T00:00:00');
   const end = new Date(checkout.value + 'T00:00:00');
 
-  const diffTime = end.getTime() - start.getTime();
-  const nights = diffTime / (1000*60*60*24);
+  const diff = (end - start)/(1000*60*60*24);
 
-  if(nights < 1){
-    // ข้อความใต้ฟอร์ม ไม่ alert
+  if(diff < 1){
+    // เช็คเอาท์ก่อนเช็คอินจริง ๆ ถึงเด้ง
     errorMsg.textContent = "Check-out must be after Check-in";
     return;
   }
 
   if(isRangeBlocked(start, end)){
-    alert("Some dates are not available"); // เด้ง alert เฉพาะวันซ้ำจริง
+    // วันถูกจองจริง ๆ ถึงเด้ง
+    alert("Some dates are not available");
     checkin.value = "";
     checkout.value = "";
     return;
   }
 
-  const total = nights * pricePerNight;
-  nightsText.innerText = nights;
+  // วันถูกต้อง คำนวณราคา
+  const total = diff * pricePerNight;
+  nightsText.innerText = diff;
   priceText.innerText = total.toLocaleString();
-  payAmount.innerText = total.toLocaleString();
 }
 
 checkin.addEventListener("change", calculate);
@@ -227,18 +197,16 @@ checkout.addEventListener("change", calculate);
 // กด Confirm
 function confirmBooking(){
   if(!checkin.value || !checkout.value){
-    alert("Please select check-in and check-out"); // เด้ง alert ถ้ายังไม่ได้เลือกวัน
+    alert("Please select check-in and check-out");
     return;
   }
-
   if(nightsText.innerText == 0){
-    errorMsg.textContent = "Check-out must be after Check-in"; // ถ้าเลือกวันแล้วแต่ผิดลำดับ
+    errorMsg.textContent = "Check-out must be after Check-in";
+    return;
   }
 
   // Redirect ไปหน้า payment.html
   window.location.href = "payment.html";
-}
-  document.getElementById("paymentBox").style.display="block";
 }
 </script>
 
