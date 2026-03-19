@@ -55,10 +55,6 @@ button{width:100%;padding:16px;margin-top:16px;border:none;border-radius:14px;ba
 </div>
 
 <script>
-// --- Config ---
-const holdTimeMinutes = 10;
-
-// --- Elements ---
 const checkin = document.getElementById("checkin");
 const checkout = document.getElementById("checkout");
 const nightsText = document.getElementById("nights");
@@ -66,22 +62,22 @@ const priceText = document.getElementById("price");
 const inputName = document.getElementById("name");
 const inputPhone = document.getElementById("phone");
 const inputLine = document.getElementById("line");
+const holdTimeMinutes = 10;
 
-// --- Dummy bookedDates ---
-let bookedDates = []; // ["2026-03-20","2026-03-21"]
-
+// --- bookedDates dummy / fetch from Sheet ---
+let bookedDates = []; 
 async function loadBookedDates(){
   try{
     const res = await fetch("https://script.google.com/macros/s/AKfycbwxKIMgfK8VQbQw3OtH2W29HcSx94SeUv_8NygBVr02jbzkuCW4Y37Xabm52AZXUEat/exec");
     bookedDates = await res.json();
     setInitialDates();
-  } catch(e){ console.log("Cannot load booked dates:", e);}
+  } catch(e){ console.log("Cannot load booked dates:", e); setInitialDates();}
 }
 loadBookedDates();
 
 // --- Utilities ---
-function showAlert(msgEng,msgThai){alert(msgEng+"\n"+msgThai);}
 function formatDate(d){return d.toISOString().split('T')[0];}
+function showAlert(msgEng,msgThai){alert(msgEng+"\n"+msgThai);}
 function isRangeBlocked(start,end){
   let current = new Date(start);
   while(current < end){
@@ -92,16 +88,20 @@ function isRangeBlocked(start,end){
   return false;
 }
 
-// --- Set initial dates (Check-in tomorrow) ---
+// --- Set initial dates ---
 function setInitialDates(){
-  let today = new Date();
-  let checkInDate = new Date(today);
-  checkInDate.setDate(checkInDate.getDate()+1); // วันพรุ่งนี้
-  let checkOutDate = new Date(checkInDate);
-  checkOutDate.setDate(checkOutDate.getDate()+1); // 1 คืน
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate()+1);
+  const dayAfter = new Date(tomorrow);
+  dayAfter.setDate(dayAfter.getDate()+1);
 
-  checkin.value = formatDate(checkInDate);
-  checkout.value = formatDate(checkOutDate);
+  checkin.value = formatDate(tomorrow);
+  checkout.value = formatDate(dayAfter);
+
+  // min date
+  checkin.min = formatDate(tomorrow);
+  checkout.min = formatDate(tomorrow);
 
   updateSummary();
 }
@@ -111,21 +111,18 @@ async function updateSummary(){
   const start = new Date(checkin.value+'T00:00:00');
   const end = new Date(checkout.value+'T00:00:00');
   const nights = Math.round((end-start)/(1000*60*60*24));
-  nightsText.innerText = nights;
+  nightsText.innerText = nights>0? nights : 1;
 
-  // --- ดึงราคา dynamic จาก Sheet ---
+  // --- fetch price from Sheet ---
   try{
     const res = await fetch("https://script.google.com/macros/s/your_price_sheet_url/exec?checkin="+checkin.value+"&checkout="+checkout.value);
     const data = await res.json();
     const total = data.totalPrice || 0;
     priceText.innerText = total.toLocaleString();
-  }catch(e){
-    console.log("Cannot fetch price, set 0");
-    priceText.innerText = 0;
-  }
+  }catch(e){ priceText.innerText = 0; }
 }
 
-// --- Allow user to edit dates freely ---
+// --- Listen input changes ---
 checkin.addEventListener("input",updateSummary);
 checkout.addEventListener("input",updateSummary);
 
@@ -133,28 +130,24 @@ checkout.addEventListener("input",updateSummary);
 function confirmBooking(){
   const start = new Date(checkin.value+'T00:00:00');
   const end = new Date(checkout.value+'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
 
-  // ตรวจเฉพาะวันผิด/เต็ม/ย้อนหลัง
-  const today = new Date();
-  today.setHours(0,0,0,0);
   if(end <= start || start < today || isRangeBlocked(start,end)){
     showAlert("Invalid date or unavailable","วันที่ไม่ถูกต้องหรือถูกจองแล้ว");
-    setInitialDates(); // reset เป็นวันพรุ่งนี้
+    setInitialDates();
     return;
   }
 
-  // --- Pending ---
   const holdExpiry = new Date();
   holdExpiry.setMinutes(holdExpiry.getMinutes() + holdTimeMinutes);
   console.log("Room pending until:", holdExpiry.toISOString());
 
-  // Alert 2 ภาษา
   showAlert("Booking Pending! Scan QR to pay","จองพักแล้ว! สแกน QR เพื่อชำระเงิน");
 
-  // --- Redirect to payment.html ---
-  window.location.href = "payment.html";
+  // --- redirect ---
+  window.location.href="payment.html";
 
-  // --- Optional: บันทึกข้อมูลลง Sheet ถ้ามี ---
+  // --- Optional: Save filled info ---
   const bookingData = {
     checkin: checkin.value,
     checkout: checkout.value,
@@ -163,7 +156,7 @@ function confirmBooking(){
     line: inputLine.value.trim(),
     timestamp: new Date().toISOString()
   };
-  console.log("Booking data (to save if provided):", bookingData);
+  console.log("Booking data:",bookingData);
 }
 </script>
 
