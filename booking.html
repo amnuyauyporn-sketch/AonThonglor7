@@ -275,19 +275,7 @@ function isBlocked(date){
   return bookedDates.includes(date);
 }
 
-checkin.addEventListener("change", () => {
-  if(isBlocked(checkin.value)){
-    alert("Date not available");
-    checkin.value="";
-  }
-});
 
-checkout.addEventListener("change", () => {
-  if(isBlocked(checkout.value)){
-    alert("Date not available");
-    checkout.value="";
-  }
-});
 const pricePerNight = 1500;
 
 const checkin = document.getElementById("checkin");
