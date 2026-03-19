@@ -326,6 +326,9 @@ return;
 }
   if(isRangeBlocked(start, end)){
   alert("Some dates are not available");
+  nightsText.innerText = 0;
+  priceText.innerText = 0;
+  payAmount.innerText = 0;
   return;
 }
 const total = nights * pricePerNight;
