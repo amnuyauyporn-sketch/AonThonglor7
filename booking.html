@@ -78,11 +78,6 @@ button{
   font-weight:600;
   cursor:pointer;
 }
-#errorMsg {
-  color:red;
-  margin-top:8px;
-  font-size:14px;
-}
 </style>
 </head>
 <body>
@@ -103,8 +98,6 @@ button{
     <input type="date" id="checkout">
   </div>
 </div>
-
-<div id="errorMsg"></div>
 
 <div class="summary">
   <div><span id="nights">0</span> Nights</div>
@@ -151,16 +144,29 @@ const checkin = document.getElementById("checkin");
 const checkout = document.getElementById("checkout");
 const nightsText = document.getElementById("nights");
 const priceText = document.getElementById("price");
-const errorMsg = document.getElementById("errorMsg");
+const inputName = document.getElementById("name");
+const inputPhone = document.getElementById("phone");
+const inputLine = document.getElementById("line");
 
 // ป้องกันวันย้อนหลัง
 const today = new Date().toISOString().split("T")[0];
 checkin.min = today;
 checkout.min = today;
 
+// popup 2 พาสา
+function showAlert(msgEng, msgThai){
+  alert(msgEng + "\n" + msgThai);
+}
+
+// ตรวจเบอร์โทร
+function validatePhone(phone){
+  phone = phone.trim();
+  const phoneRegex = /^[0-9]{10}$/;
+  return phoneRegex.test(phone);
+}
+
 // คำนวณคืนและราคา
 function calculate(){
-  errorMsg.textContent = '';
   nightsText.innerText = 0;
   priceText.innerText = 0;
 
@@ -172,43 +178,52 @@ function calculate(){
   const diff = Math.round((end - start)/(1000*60*60*24));
 
   if(diff < 1){
-    // เช็คเอาท์ก่อนเช็คอินจริง ๆ ถึงเด้ง
-    errorMsg.textContent = "Check-out must be after Check-in";
+    showAlert("Check-out must be after Check-in","กรุณาเลือกวันเช็คเอาท์หลังเช็คอิน");
     return;
   }
 
   if(isRangeBlocked(start,end)){
-    // วันถูกจองจริง ๆ ถึงเด้ง
-    alert("Some dates are not available");
+    showAlert("Some dates are not available","วันที่เลือกมีผู้จองแล้ว");
     checkin.value = "";
     checkout.value = "";
     return;
   }
 
-  // วันถูกต้อง คำนวณราคา
   const total = diff * pricePerNight;
   nightsText.innerText = diff;
   priceText.innerText = total.toLocaleString();
 }
 
-// ใช้ event ทั้ง input + change ให้มือถือ/Touch device ทำงานทันที
-checkin.addEventListener("change", calculate);
-checkout.addEventListener("change", calculate);
 checkin.addEventListener("input", calculate);
 checkout.addEventListener("input", calculate);
+checkin.addEventListener("change", calculate);
+checkout.addEventListener("change", calculate);
 
-// กด Confirm
+// Confirm Booking
 function confirmBooking(){
+  calculate(); // คำนวณก่อน
   if(!checkin.value || !checkout.value){
-    alert("Please select check-in and check-out");
+    showAlert("Please select check-in and check-out","กรุณาเลือกวันเช็คอิน/เช็คเอาท์");
     return;
   }
   if(nightsText.innerText == 0){
-    errorMsg.textContent = "Check-out must be after Check-in";
+    showAlert("Check-out must be after Check-in","กรุณาเลือกวันเช็คเอาท์หลังเช็คอิน");
+    return;
+  }
+  if(inputName.value.trim() === ""){
+    showAlert("Please enter your name","กรุณาใส่ชื่อ");
+    return;
+  }
+  if(!validatePhone(inputPhone.value)){
+    showAlert("Please enter a valid 10-digit phone number","กรุณาใส่เบอร์โทร 10 หลัก");
+    return;
+  }
+  if(inputLine.value.trim() === ""){
+    showAlert("Please enter your LINE ID","กรุณาใส่ LINE ID");
     return;
   }
 
-  // Redirect ไปหน้า payment.html
+  // ครบทุกอย่าง → redirect
   window.location.href = "payment.html";
 }
 </script>
