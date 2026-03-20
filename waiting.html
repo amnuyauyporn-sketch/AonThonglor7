@@ -4,59 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checking Payment - Thonglor 7</title>
+<script src="config.js"></script>
 <style>
-/* ธีม OLED Black ประหยัดไฟพิกเซลปิดสนิท */
+/* ธีม OLED Black ประหยัดไฟพิกเซลปิดสนิท 100% */
 body{
     margin:0;
     font-family:-apple-system, BlinkMacSystemFont, sans-serif;
-    background:#000; /* ดำสนิท */
+    background:#000;
     color:#fff;
+    overflow: hidden;
 }
 
-/* พื้นหลังรูปภาพ (ใส่ Filter ให้มืดลงหน่อยจะได้ไม่แสบตาตอนตีสี่) */
+/* พื้นหลังรูปภาพ ย้อมให้มืดถนอมสายตา */
 .bg{
     position:fixed;
     width:100%;
     height:100%;
     background:url('checkin2.PNG') center/cover no-repeat;
-    filter: brightness(0.3) grayscale(50%); /* ปรับรูปให้ดูขรึม */
+    filter: brightness(0.2) grayscale(30%);
+    z-index: -1;
 }
 
-/* overlay ดำสนิท */
 .overlay{
     position:fixed;
     width:100%;
     height:100%;
     background:rgba(0,0,0,0.6);
+    z-index: -1;
 }
 
-/* layout */
 .container{
-    position:relative;
     min-height:100vh;
     display:flex;
     align-items:flex-end;
     justify-content:center;
     padding:40px 20px 80px;
+    box-sizing: border-box;
 }
 
-/* card สีดำเข้ม */
+/* card สีดำเข้มขรึม */
 .card{
     width:100%;
     max-width:420px;
-    background:#111; /* เทาเข้มเกือบดำ */
+    background:#111;
     border-radius:24px;
     padding:44px 28px;
     border:1px solid #222;
-    box-shadow:0 20px 40px rgba(0,0,0,0.5);
+    box-shadow:0 20px 40px rgba(0,0,0,0.8);
     min-height:320px;
     display:flex;
     flex-direction:column;
     justify-content:center;
-    box-sizing:border-box;
 }
 
-/* text */
 h2{
     text-align:center;
     margin:0;
@@ -67,34 +67,32 @@ h2{
 p{
     text-align:center;
     color:#888;
-    margin-top:10px;
+    margin:15px 0;
     font-size:15px;
 }
 
-/* loader สีขาวเด่นบนพื้นดำ */
+/* loader สีขาวลอยบนพื้นดำ */
 .loader{
     border:3px solid #222;
-    border-top:3px solid #fff; /* หมุนสีขาว */
+    border-top:3px solid #fff;
     border-radius:50%;
     width:45px;
     height:45px;
-    margin:30px auto;
+    margin:20px auto;
     animation:spin 0.8s linear infinite;
 }
 
 @keyframes spin{
-    0%{transform:rotate(0);}
+    0%{transform:rotate(0deg);}
     100%{transform:rotate(360deg);}
 }
 
-/* note */
 .note{
     text-align:center;
     font-size:12px;
     color:#444;
     margin-top:15px;
 }
-
 </style>
 </head>
 
@@ -105,8 +103,8 @@ p{
 
 <div class="container">
     <div class="card">
-        <h2>Checking Payment...</h2>
-        <p>กำลังตรวจสอบยอดโอนของท่าน<br>กรุณารอสักครู่ค่ะ</p>
+        <h2>Verifying...</h2>
+        <p>กำลังบันทึกข้อมูลและตรวจสอบยอดโอน<br>กรุณารอสักครู่ค่ะ</p>
         
         <div class="loader"></div>
         
@@ -115,23 +113,22 @@ p{
 </div>
 
 <script>
-// URL ของ Google Apps Script ของบอส
-const googleAppsScriptURL = "https://script.google.com/macros/s/AKfycbx8sGu-FbMMt23bZ-oRdTAl_0zAovIQVoNgfUIxjzZsuu_ezDXgtx_LCo9b6d-07s3T/exec";
-
+// ตรวจสอบข้อมูลจาก LocalStorage
 const storedData = localStorage.getItem("pendingBooking");
 
 if (storedData) {
     const bookingData = JSON.parse(storedData);
 
-    // ยิงข้อมูลเข้า Google Sheets
-    fetch(googleAppsScriptURL, {
+    // 2. ยิงข้อมูลเข้า Google Sheets โดยใช้ API_URL จาก config.js
+    // เจนนี่ใช้ mode: 'no-cors' ตามที่คุยกันเพื่อให้บันทึกได้ลื่นไหล
+    fetch(API_URL, {
         method: "POST",
-        mode: "no-cors", // ใช้ no-cors ถ้าเจอปัญหาเรื่อง Cross-Origin
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData) 
     })
     .then(() => {
-        // เนื่องจากใช้ no-cors เราจะไม่ได้ JSON response 
-        // เจนนี่เลยใส่หน่วงเวลาไว้ 2 วินาทีเพื่อให้มั่นใจว่าข้อมูลส่งไปแล้ว
+        // หน่วงเวลา 2.5 วินาทีเพื่อให้ดูเหมือนระบบกำลังประมวลผล (และให้ Sheets บันทึกเสร็จ)
         setTimeout(() => {
             console.log("บันทึกข้อมูลสำเร็จ!");
             window.location.href = "checkin.html";
@@ -139,11 +136,12 @@ if (storedData) {
     })
     .catch(error => {
         console.error("Error submitting data:", error);
-        alert("เครือข่ายมีปัญหา กรุณาลองใหม่อีกครั้งค่ะ");
+        alert("เครือข่ายขัดข้อง กรุณาติดต่อบอสอ้นค่ะ");
         window.location.href = "index.html";
     });
 
 } else {
+    // ถ้าไม่มีข้อมูลจอง ให้ดีดกลับหน้าแรก
     window.location.href = "index.html";
 }
 </script>
