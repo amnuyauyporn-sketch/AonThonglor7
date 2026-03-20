@@ -16,7 +16,7 @@ h1{font-size:36px;margin:10px 0;}
 .price{font-size:28px;margin-top:18px;background:#222;padding:15px;border-radius:15px;border:1px dashed #444;display:inline-block;width:80%;}
 .checkin{color:#888;margin:15px 0 10px 0;}
 .facilities{color:#666;font-size:16px;margin-bottom:30px;line-height:1.6;}
-/* ปุ่มขาวล่อนิ้วโป้งขวา */
+/* ปุ่มขาวเด่นล่อนิ้วโป้งขวาบอส */
 .button{display:block;background:#fff;color:#000;text-decoration:none;padding:18px;margin:12px auto;max-width:320px;border-radius:14px;font-size:18px;cursor:pointer;border:none;width:100%;box-sizing:border-box;font-weight:bold;}
 .button.secondary{background:#000;color:#444;border:1px solid #222;}
 .button:disabled {background:#444;color:#888;cursor:not-allowed;}
@@ -48,12 +48,16 @@ iframe{width:100%;height:350px;border:0;}
     </a>
 
     <div class="map">
-        <iframe src="https://maps.google.com/maps?q=143/6%20Sing%20Waet%20Lom%20Alley%20Bangkok&z=17&output=embed"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=YOUR_MAP_EMBED_URL"></iframe>
     </div>
 </div>
 
 <script>
-// ฟังก์ชันจัดการวันที่
+// ตรวจสอบว่ามี API_URL หรือยัง
+if (typeof API_URL === 'undefined') {
+    console.error("หาไฟล์ config.js ไม่เจอ หรือไม่ได้ตั้งค่า API_URL ค่ะบอส!");
+}
+
 function getLocalYYYYMMDD(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -61,7 +65,7 @@ function getLocalYYYYMMDD(date) {
     return `${y}-${m}-${d}`;
 }
 
-// 2. ซิงค์ราคาจาก Sheets ทันทีที่โหลดหน้า (ใช้ API_URL จาก config.js)
+// 2. ซิงค์ราคาล่าสุดจาก Sheets (ช่อง B1)
 async function syncPrice() {
     try {
         const response = await fetch(`${API_URL}?action=getPrice`);
@@ -71,17 +75,19 @@ async function syncPrice() {
             localStorage.setItem("latest_price", data.price);
         }
     } catch (error) {
-        // ถ้าเน็ตหลุด ให้ใช้ราคาล่าสุดที่เคยจำไว้ หรือ Default 1,500
+        // ใช้ราคาล่าสุดที่เคยดึงมาได้ ถ้าเน็ตมีปัญหา
         const savedPrice = localStorage.getItem("latest_price") || "1,500";
         document.getElementById("displayPrice").innerText = savedPrice;
     }
 }
+
+// รันซิงค์ราคาทันที
 syncPrice();
 
 async function confirmFastCheckIn() {
   const result = await Swal.fire({
-    title: 'Confirm Booking? / ยืนยันการจอง?',
-    text: "Do you want to check-in today? / คุณต้องการเข้าพักวันนี้ใช่หรือไม่",
+    title: 'Confirm Booking?',
+    text: "ต้องการเข้าพักวันนี้ใช่หรือไม่คะ?",
     icon: 'question',
     showCancelButton: true,
     confirmButtonColor: '#fff', 
@@ -101,11 +107,11 @@ async function confirmFastCheckIn() {
 async function fastCheckIn() {
   const btn = document.getElementById('btnFastCheckin');
   btn.disabled = true;
-  btn.innerText = "Checking... / กำลังตรวจสอบ...";
+  btn.innerText = "Checking...";
 
   try {
-    // 3. เรียกใช้ API_URL จากไฟล์ config.js
-    const response = await fetch(API_URL);
+    // 3. เรียก API_URL เพื่อเช็กสถานะล่าสุด
+    const response = await fetch(`${API_URL}?action=getPrice`);
     const data = await response.json(); 
     
     const today = new Date();
@@ -113,15 +119,16 @@ async function fastCheckIn() {
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
 
-    // ดักห้องเต็ม (ถ้ามีข้อมูลจาก Sheets)
+    // ดักสถานะห้องว่าง (ถ้าบอสมีระบบ bookedDates ใน Sheets)
     if(data.bookedDates && data.bookedDates.includes(checkinStr)) {
-       Swal.fire({ title: 'Full / ห้องเต็มแล้ว', text: 'Sorry, no rooms available tonight.', icon: 'error', background:'#111', color:'#fff' });
+       Swal.fire({ title: 'Full!', text: 'วันนี้ห้องเต็มแล้วค่ะบอส', icon: 'error', background:'#111', color:'#fff' });
        btn.disabled = false;
        btn.innerText = "Fast Check-in (เข้าพักวันนี้)";
        return; 
     }
     
-    const currentPrice = localStorage.getItem("latest_price") || "1500";
+    // ใช้ราคาจาก Sheets บันทึกลงเครื่องเพื่อไปหน้าจ่ายเงิน
+    const currentPrice = data.price || localStorage.getItem("latest_price") || "1500";
     const bookingData = {
       name: "Fast Guest",
       phone: "000-000-0000",
@@ -136,8 +143,9 @@ async function fastCheckIn() {
 
     localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
     window.location.href = "payment.html";
+
   } catch (error) {
-    Swal.fire({ title: 'Error / ปัญหาการเชื่อมต่อ', text: 'Please try again.', icon: 'error', background:'#111', color:'#fff' });
+    Swal.fire({ title: 'Error', text: 'เชื่อมต่อฐานข้อมูลไม่ได้ค่ะบอส', icon: 'error', background:'#111', color:'#fff' });
     btn.disabled = false;
     btn.innerText = "Fast Check-in (เข้าพักวันนี้)";
   }
