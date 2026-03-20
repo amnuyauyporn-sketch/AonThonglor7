@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Check-in - Aon Thonglor 7</title>
+<title>Check-in - Thonglor 7</title>
+<script src="config.js"></script>
 <style>
-/* ธีม OLED Black ประหยัดไฟพิกเซลปิดสนิท 100% สำหรับบอสอ้น */
+/* ธีม OLED Black ประหยัดไฟ iPhone 13 Pro Max ของบอสอ้น */
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#000;color:#fff;text-align:center;}
 .bg{position:fixed;width:100%;height:100%;background:url('checkin2.PNG') center/cover no-repeat;filter:brightness(0.2);z-index:-1;}
 .overlay{position:fixed;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:-1;}
@@ -16,7 +17,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background
 .nav-btn{display:block;background:#222;color:#fff;text-align:center;padding:12px;text-decoration:none;font-weight:600;font-size:14px;margin-top:10px;border-radius:12px;border:1px solid #333;}
 h2{margin:20px 0 10px;font-size:24px;letter-spacing:1px;}
 p{color:#888;margin-top:10px;font-size:15px;}
-.unlock-btn{margin-top:24px;width:100%;padding:20px;border:none;border-radius:16px;background:#fff;color:#000;font-size:18px;font-weight:bold;cursor:pointer;}
+/* ปุ่มขาวเด่นล่อนิ้วโป้งขวาบอส */
+.unlock-btn{margin-top:24px;width:100%;padding:20px;border:none;border-radius:16px;background:#fff;color:#000;font-size:20px;font-weight:bold;cursor:pointer;}
 .unlock-btn:active{transform:scale(0.95);}
 .loader{border:4px solid #222;border-top:4px solid #fff;border-radius:50%;width:50px;height:50px;margin:25px auto;animation:spin 1s linear infinite;display:none;}
 @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
@@ -46,7 +48,7 @@ p{color:#888;margin-top:10px;font-size:15px;}
     <div class="success" id="success">Door Unlocked / ประตูเปิดแล้ว 🚪</div>
     <div class="note">Security enabled: One-time access only</div>
 
-    <a href="https://line.me/ti/p/~YOUR_ID" target="_blank" class="line-contact">💬 Contact Admin (ติดต่อบอสอ้น)</a>
+    <a href="https://line.me/ti/p/~ใส่ไอดีบอสตรงนี้" target="_blank" class="line-contact">💬 Contact Admin (ติดต่อบอสอ้น)</a>
 </div>
 </div>
 
@@ -55,14 +57,14 @@ p{color:#888;margin-top:10px;font-size:15px;}
 function checkAuth() {
     const bookingData = localStorage.getItem("pendingBooking");
     if (!bookingData) {
-        alert("🔒 Access Denied: กรุณาจองและชำระเงินก่อนค่ะ");
-        window.location.href = "index.html"; // ดีดกลับหน้าแรกทันที
+        alert("🔒 Access Denied: กรุณาจองและชำระเงินก่อนค่ะบอส");
+        window.location.href = "index.html"; // พิมพ์ URL เข้ามาเอง ดีดหน้าสั่นกลับหน้าแรกทันที
         return null;
     }
     return JSON.parse(bookingData);
 }
 
-// เช็กทันทีที่โหลดหน้า
+// เช็กสิทธิ์ทันทีที่โหลดหน้า
 const authData = checkAuth();
 
 async function openDoor(){
@@ -78,28 +80,29 @@ async function openDoor(){
     btn.innerHTML = "Opening... / กำลังเปิด...";
     loader.style.display = "block";
 
-    // URL ของ Shelly / Sonoff ที่บอสเตรียมไว้
-    const doorURL = "https://script.google.com/macros/s/AKfycbxYF8QAf70ZRK0FmLLDG_4BKKT9b9Q1zr61LwP1Tq0I7BSlahx-0EGhznM0ost5Adkz/exec";
+    // 2. ยิงสัญญาณเปิดประตูผ่าน API_URL จาก config.js
+    // พ่วงตัวแปร action=openDoor ไปด้วยตามลอจิก Apps Script ของบอส
+    const openDoorURL = `${API_URL}?action=openDoor`;
 
     try {
-        // ยิงสัญญาณเปิดประตู
-        await fetch(doorURL, { mode: 'no-cors' });
+        // ยิงสัญญาณ (ใช้ mode no-cors เพื่อให้ผ่านด่าน Security ของเบราว์เซอร์)
+        await fetch(openDoorURL, { mode: 'no-cors' });
         
         setTimeout(function(){
             loader.style.display = "none";
             success.style.display = "block";
             title.innerHTML = "Welcome! / เข้าพักได้เลย";
-            desc.innerHTML = "Enjoy your stay at Thonglor 7";
+            desc.innerHTML = "Door is now UNLOCKED 🚪";
             btn.style.display = "none";
             
-            // --- ทำลายหลักฐาน: ป้องกันคนแชร์ URL ไปให้เพื่อนเปิดต่อ ---
+            // --- ทำลายหลักฐาน: ลบข้อมูลจองทิ้งทันที ป้องกันการแชร์ URL ให้เพื่อนเปิดเล่น ---
             localStorage.removeItem("pendingBooking");
         }, 2500);
         
     } catch (e) {
         alert("ระบบขัดข้อง กรุณาติดต่อบอสอ้นค่ะ");
         btn.disabled = false;
-        btn.innerHTML = "🔓 Unlock Entrance";
+        btn.innerText = "🔓 Unlock Entrance";
     }
 }
 </script>
