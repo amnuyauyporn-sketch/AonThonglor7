@@ -1,156 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Book in Advance - Aon Thonglor 7</title>
 <style>
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;background:#f2f2f2;}
+/* ธีม OLED Black ประหยัดไฟไอโฟนพี่อ้น */
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;background:#000;color:#fff;text-align:center;}
 .hero img{width:100%;height:300px;object-fit:cover;display:block;}
-.booking-box{width:92%;max-width:520px;margin:-20px auto 30px auto;background:white;padding:20px;border-radius:18px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+.booking-box{width:92%;max-width:520px;margin:-20px auto 30px auto;background:#111;padding:20px;border-radius:18px;border:1px solid #222;}
 .date-row{display:flex;gap:10px;margin-bottom:10px;}
-.date-field{flex:1;}
-label{font-size:14px;font-weight:600;color:#555;display:block;margin-bottom:4px;}
-input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;font-size:16px;box-sizing:border-box;background:#fafafa;}
-input[type="date"]{height:40px;padding:6px 10px;font-size:14px;}
-.summary{margin-top:14px;background:#f5f5f5;padding:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;font-size:18px;font-weight:600;}
+.date-field{flex:1;text-align:left;}
+label{font-size:13px;font-weight:600;color:#888;display:block;margin-bottom:4px;}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;font-size:16px;box-sizing:border-box;}
+input::placeholder{color:#555;}
+input[type="date"]{height:45px;padding:10px;font-size:14px;color-scheme:dark;}
+.summary{margin-top:14px;background:#1a1a1a;padding:16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;font-size:18px;font-weight:600;border:1px solid #222;}
 .input-group{margin-top:12px;}
-button{width:100%;padding:16px;margin-top:16px;border:none;border-radius:14px;background:black;color:white;font-size:17px;font-weight:600;cursor:pointer;}
+/* ปุ่มสีขาวล่อนิ้วโป้งขวา */
+button{width:100%;padding:18px;margin-top:20px;border:none;border-radius:14px;background:#fff;color:#000;font-size:18px;font-weight:bold;cursor:pointer;}
+button:active{transform:scale(0.98);}
+.back-link{display:block;margin-top:20px;color:#555;text-decoration:none;font-size:14px;}
 </style>
 </head>
 <body>
 
 <div class="hero">
-<img src="room2.PNG" alt="Room">
-</div>
+<img src="room2.PNG" alt="Room"> </div>
 
 <div class="booking-box">
+  <h2 style="margin-top:0; font-size:22px;">Book in Advance / จองล่วงหน้า</h2>
+  
   <div class="date-row">
     <div class="date-field">
-      <label>Check-in</label>
+      <label>Check-in / เช็คอิน</label>
       <input type="date" id="checkin">
     </div>
     <div class="date-field">
-      <label>Check-out</label>
+      <label>Check-out / เช็คเอาท์</label>
       <input type="date" id="checkout">
     </div>
   </div>
 
   <div class="summary">
-    <div><span id="nights">1</span> Nights</div>
-    <div><span id="price">0</span> THB</div>
+    <div><span id="nights">1</span> Nights / คืน</div>
+    <div style="color:#fff;"><span id="price">0</span> THB</div>
   </div>
 
-  <div class="input-group">
-    <input type="text" placeholder="Your name" id="name">
-  </div>
-  <div class="input-group">
-    <input type="tel" placeholder="Phone number" id="phone">
-  </div>
-  <div class="input-group">
-    <input type="text" placeholder="LINE ID" id="line">
-  </div>
+  <div class="input-group"><input type="text" placeholder="Name / ชื่อผู้จอง" id="name"></div>
+  <div class="input-group"><input type="tel" placeholder="Phone / เบอร์โทรศัพท์" id="phone"></div>
+  <div class="input-group"><input type="text" placeholder="LINE ID / ไอดีไลน์" id="line"></div>
 
-  <button onclick="confirmBooking()">Book in Advance</button>
+  <button onclick="confirmBooking()">Book in Advance (จองล่วงหน้า)</button>
+  <a href="index.html" class="back-link">Cancel / ยกเลิกกลับหน้าหลัก</a>
 </div>
 
 <script>
-// --- Elements ---
 const checkin = document.getElementById("checkin");
 const checkout = document.getElementById("checkout");
 const nightsText = document.getElementById("nights");
 const priceText = document.getElementById("price");
-const inputName = document.getElementById("name");
-const inputPhone = document.getElementById("phone");
-const inputLine = document.getElementById("line");
-const holdTimeMinutes = 10;
-
-// --- Dummy bookedDates ---
-let bookedDates = []; // e.g., ["2026-03-20","2026-03-21"]
 
 function formatDate(d){return d.toISOString().split('T')[0];}
-function showAlert(msgEng,msgThai){alert(msgEng+"\n"+msgThai);}
-function isRangeBlocked(start,end){
-  let current = new Date(start);
-  while(current < end){
-    if(bookedDates.includes(formatDate(current))) return true;
-    current.setDate(current.getDate()+1);
-  }
-  return false;
-}
 
-// --- Set initial dates ---
-function setInitialDates(){
-  const today = new Date();
-  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
-  const dayAfter = new Date(tomorrow); dayAfter.setDate(dayAfter.getDate()+1);
-
-  checkin.value = formatDate(tomorrow);
-  checkout.value = formatDate(dayAfter);
-
-  checkin.min = formatDate(tomorrow);
-  checkout.min = formatDate(dayAfter);
-
-  updateSummary();
-}
-
-// --- Update summary & price ---
 function updateSummary(){
   const start = new Date(checkin.value + "T00:00:00");
   const end = new Date(checkout.value + "T00:00:00");
-  
   let nights = Math.round((end-start)/(1000*60*60*24));
   if(nights < 1) nights = 1;
   nightsText.innerText = nights;
-
-  let pricePerNight = 1500; 
-  let total = nights * pricePerNight;
-  priceText.innerText = total.toLocaleString();
+  priceText.innerText = (nights * 1500).toLocaleString();
 }
 
-// --- Smart Date Listeners ---
-checkin.addEventListener("change", () => {
-  if (checkin.value >= checkout.value) {
-    let newOut = new Date(checkin.value);
-    newOut.setDate(newOut.getDate() + 1);
-    checkout.value = formatDate(newOut);
-  }
-  updateSummary();
-});
-
-checkout.addEventListener("change", () => {
-  if (checkout.value <= checkin.value) {
-    let newIn = new Date(checkout.value);
-    newIn.setDate(newIn.getDate() - 1);
-    checkin.value = formatDate(newIn);
-  }
-  updateSummary();
-});
-
-// --- Confirm Booking ---
 function confirmBooking(){
-  const start = new Date(checkin.value + "T00:00:00");
-  const end = new Date(checkout.value + "T00:00:00");
-  const today = new Date(); today.setHours(0,0,0,0);
-
-  // Validate Dates
-  if(end <= start || start < today || isRangeBlocked(start,end)){
-    showAlert("Invalid date or unavailable","วันที่ไม่ถูกต้องหรือถูกจองแล้ว");
-    setInitialDates();
-    return;
-  }
-
-  // Validate Inputs
-  const nameVal = inputName.value.trim();
-  const phoneVal = inputPhone.value.trim();
-  const lineVal = inputLine.value.trim();
+  const nameVal = document.getElementById("name").value.trim();
+  const phoneVal = document.getElementById("phone").value.trim();
+  const lineVal = document.getElementById("line").value.trim();
 
   if(!nameVal || !phoneVal || !lineVal) {
-    showAlert("Please fill in all information", "กรุณากรอก ชื่อ เบอร์โทร และ LINE ID ให้ครบถ้วน");
+    alert("Please fill in all information\nกรุณากรอกข้อมูลให้ครบถ้วนค่ะ");
     return;
   }
 
-  // Prepare Data
   const bookingData = {
     checkin: checkin.value,
     checkout: checkout.value,
@@ -159,22 +90,32 @@ function confirmBooking(){
     name: nameVal,
     phone: phoneVal,
     line: lineVal,
+    type: "Advance Booking",
     timestamp: new Date().toISOString()
   };
 
-  // Save to LocalStorage BEFORE redirecting
   localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
-
-  showAlert("Booking Pending! Scan QR to pay","จองพักแล้ว! สแกน QR เพื่อชำระเงิน");
-
-  // Redirect to payment
   window.location.href="payment.html";
 }
 
-// --- Initialize ---
-setInitialDates();
+// Initial Set
+const today = new Date();
+const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+const dayAfter = new Date(tomorrow); dayAfter.setDate(dayAfter.getDate()+1);
+checkin.value = formatDate(tomorrow);
+checkout.value = formatDate(dayAfter);
+checkin.min = formatDate(tomorrow);
+updateSummary();
 
+checkin.addEventListener("change", () => {
+  if (checkin.value >= checkout.value) {
+    let newOut = new Date(checkin.value);
+    newOut.setDate(newOut.getDate() + 1);
+    checkout.value = formatDate(newOut);
+  }
+  updateSummary();
+});
+checkout.addEventListener("change", updateSummary);
 </script>
-
 </body>
 </html>
