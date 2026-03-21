@@ -1,264 +1,48 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Aon Thonglor 7 - Premium Boutique Room</title>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<style>
-/* OLED Black - ประหยัดไฟ เน้นความพรีเมียม */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: #000;
-    color: #fff;
-    line-height: 1.5;
-}
-
-.hero {
-    position: relative;
-    height: 320px;
-    overflow: hidden;
-}
-
-.hero img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.container {
-    background: #111;
-    border-radius: 32px 32px 0 0;
-    margin-top: -28px;
-    position: relative;
-    padding: 28px 20px 40px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: none;
-}
-
-h1 {
-    font-size: 32px;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-    letter-spacing: -0.3px;
-    background: linear-gradient(135deg, #fff 0%, #ccc 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.subtitle {
-    color: #888;
-    font-size: 15px;
-    font-weight: 400;
-    margin-bottom: 20px;
-}
-
-.price-card {
-    background: #1a1a1a;
-    border-radius: 24px;
-    padding: 16px 20px;
-    margin: 16px 0;
-    border: 1px solid #2a2a2a;
-}
-
-.price-label {
-    font-size: 14px;
-    color: #aaa;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-}
-
-.price-value {
-    font-size: 36px;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1;
-}
-
-.price-value small {
-    font-size: 16px;
-    font-weight: 400;
-    color: #888;
-}
-
-.checkin-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #1a1a1a;
-    padding: 8px 16px;
-    border-radius: 40px;
-    font-size: 14px;
-    color: #ccc;
-    margin: 12px 0 16px;
-}
-
-.facilities {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin: 20px 0 28px;
-    justify-content: center;
-}
-
-.facility-item {
-    background: #1a1a1a;
-    padding: 8px 16px;
-    border-radius: 30px;
-    font-size: 13px;
-    color: #ddd;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.btn-primary {
-    display: block;
-    width: 100%;
-    max-width: 320px;
-    margin: 16px auto;
-    background: #fff;
-    color: #000;
-    text-align: center;
-    padding: 16px 20px;
-    border-radius: 60px;
-    font-weight: 700;
-    font-size: 17px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    box-shadow: 0 2px 8px rgba(255,255,255,0.05);
-}
-
-.btn-primary:active {
-    transform: scale(0.97);
-    background: #eee;
-}
-
-.btn-secondary {
-    display: block;
-    width: 100%;
-    max-width: 320px;
-    margin: 12px auto;
-    background: transparent;
-    color: #ccc;
-    text-align: center;
-    padding: 15px 20px;
-    border-radius: 60px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    border: 1px solid #333;
-    text-decoration: none;
-    transition: all 0.2s;
-}
-
-.btn-secondary:active {
-    background: #1a1a1a;
-}
-
-.btn-primary:disabled, .btn-secondary:disabled {
-    opacity: 0.5;
-    transform: none;
-    cursor: not-allowed;
-}
-
-.map-container {
-    margin: 32px 0 20px;
-    border-radius: 28px;
-    overflow: hidden;
-    border: 1px solid #2a2a2a;
-    background: #0a0a0a;
-}
-
-.map-container iframe {
-    width: 100%;
-    height: 280px;
-    display: block;
-    border: 0;
-}
-
-.footer-note {
-    text-align: center;
-    font-size: 12px;
-    color: #555;
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid #222;
-}
-</style>
-</head>
-<body>
-
-<div class="hero">
-    <img src="room.png" alt="Aon Thonglor 7 Premium Room" onerror="this.src='https://placehold.co/800x600/1a1a1a/666?text=Aon+Thonglor+7'">
-</div>
-
-<div class="container">
-    <h1>Aon Thonglor 7</h1>
-    <div class="subtitle">Boutique Room • Thonglor • Bangkok</div>
-    
-    <div class="price-card">
-        <div class="price-label">ราคาคืนนี้ (รวมภาษี)</div>
-        <div class="price-value">
-            <span id="displayPrice">—</span> <small>THB / Night</small>
-        </div>
-    </div>
-    
-    <div class="checkin-badge">
-        <span>🕒</span> Self Check-in 24 ชม. 
-        <span style="margin-left: 8px;">🛡️</span> ปลอดภัย มั่นใจ
-    </div>
-    
-    <div class="facilities">
-        <span class="facility-item">📶 WiFi เร็ว</span>
-        <span class="facility-item">❄️ แอร์เย็น</span>
-        <span class="facility-item">🚿 น้ำร้อน</span>
-        <span class="facility-item">🧊 ตู้เย็น</span>
-        <span class="facility-item">🔥 ไมโครเวฟ</span>
-    </div>
-
-    <button class="btn-primary" id="btnFastCheckin">
-        ⚡ Fast Check-in (คืนนี้)
-    </button>
-
-    <a class="btn-secondary" href="booking.html">
-        📅 จองล่วงหน้า
-    </a>
-
-    <!-- แผนที่ Google Maps แก้ไขตามพิกัดทองหล่อของคุณ -->
-    <div class="map-container">
-        <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3875.7970912943456!2d100.579367!3d13.7307312!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29fac9dbff2a3%3A0x6f9b0a8cc8a0d9b8!2s143%2F6%20Sing%20Waet%20Lom%20Alley%2C%20Khwaeng%20Khlong%20Tan%20Nuea%2C%20Watthana%2C%20Krung%20Thep%20Maha%20Nakhon%2010110!5e0!3m2!1sen!2sth!4v1774057508289!5m2!1sen!2sth" 
-            width="600" 
-            height="450" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-    </div>
-    
-    <div class="footer-note">
-        รองรับการจองผ่านระบบอัตโนมัติ • ข้อมูลปลอดภัย
-    </div>
-</div>
-
 <script>
-// กำหนด API URL (ไว้ให้ config.js กำหนด แต่กัน error)
-const CONFIG_API_URL = (typeof API_URL !== 'undefined') ? API_URL : null;
+// 1. วาง URL ของ Web App ที่ได้จาก Google Apps Script ที่นี่
+const CONFIG_API_URL = "https://script.google.com/macros/s/AKfycbyhgz12OXm9jX9RaDS7Vaek6b63pMibw0bh4AyoAzO9oSMamasxTIBoIFCAjlTigZwZ/exec";
 
-// ฟังก์ชันแปลงวันที่เป็น YYYY-MM-DD ตาม timezone ไทย
+// ฟังก์ชันดึงราคาและวันที่จองจาก Google Sheets
+async function syncRoomData() {
+    const priceEl = document.getElementById("displayPrice");
+    
+    try {
+        // เรียกใช้ action=getPrice ตามที่เขียนใน Apps Script
+        const response = await fetch(`${CONFIG_API_URL}?action=getPrice`);
+        const data = await response.json();
+        
+        if (data.status === "success" && data.price) {
+            // แปลงเป็นตัวเลขและใส่คอมม่า พร้อมทศนิยม 2 ตำแหน่ง
+            const numericPrice = parseFloat(data.price);
+            const formattedPrice = numericPrice.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            priceEl.innerText = formattedPrice;
+            
+            // บันทึกค่าลง LocalStorage เผื่อเน็ตหลุดครั้งหน้า
+            localStorage.setItem("latest_price", data.price);
+            if (data.bookedDates) {
+                localStorage.setItem("cached_booked_dates", JSON.stringify(data.bookedDates));
+            }
+        }
+    } catch (error) {
+        console.error("เชื่อมต่อ API ไม่ได้:", error);
+        // ถ้าดึงไม่ได้ ให้ใช้ราคาล่าสุดที่เคยบันทึกไว้
+        const saved = localStorage.getItem("latest_price");
+        if (saved) {
+            priceEl.innerText = parseFloat(saved).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        } else {
+            priceEl.innerText = "1,251.21"; // ราคาสำรองกรณี error ครั้งแรก
+        }
+    }
+}
+
+// ฟังก์ชันแปลงวันที่เป็น YYYY-MM-DD
 function getLocalYYYYMMDD(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -266,144 +50,78 @@ function getLocalYYYYMMDD(date) {
     return `${y}-${m}-${d}`;
 }
 
-// ดึงราคาและสถานะจาก Google Sheets
-async function syncRoomData() {
-    const priceEl = document.getElementById("displayPrice");
-    if (!CONFIG_API_URL) {
-        priceEl.innerText = "2,200";
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${CONFIG_API_URL}?action=getData`);
-        const data = await response.json();
-        
-        if (data.price) {
-            const formattedPrice = Number(data.price).toLocaleString();
-            priceEl.innerText = formattedPrice;
-            localStorage.setItem("latest_price", data.price);
-        } else if (localStorage.getItem("latest_price")) {
-            priceEl.innerText = Number(localStorage.getItem("latest_price")).toLocaleString();
-        } else {
-            priceEl.innerText = "2,200";
-        }
-        
-        // เก็บข้อมูลวันจองไว้เช็คด่วน
-        if (data.bookedDates && Array.isArray(data.bookedDates)) {
-            localStorage.setItem("cached_booked_dates", JSON.stringify(data.bookedDates));
-        }
-        
-    } catch (error) {
-        console.log("API ยังไม่พร้อม ใช้ข้อมูลสำรอง");
-        const saved = localStorage.getItem("latest_price");
-        priceEl.innerText = saved ? Number(saved).toLocaleString() : "2,200";
-    }
-}
-
-// Fast Check-in ระบบจองวันนี้
+// ระบบ Fast Check-in (จองวันนี้)
 async function fastCheckIn() {
     const btn = document.getElementById('btnFastCheckin');
-    if (!CONFIG_API_URL) {
-        Swal.fire({
-            title: 'ระบบยังไม่พร้อม',
-            text: 'กรุณาตั้งค่า config.js ให้เรียบร้อยก่อนใช้งาน',
-            icon: 'error',
-            background: '#111',
-            color: '#fff'
-        });
-        return;
-    }
-    
     btn.disabled = true;
     btn.innerHTML = "⏳ กำลังตรวจสอบ...";
-    
+
     try {
-        const response = await fetch(`${CONFIG_API_URL}?action=getData`);
+        const response = await fetch(`${CONFIG_API_URL}?action=getPrice`);
         const data = await response.json();
         
         const today = new Date();
         const checkinStr = getLocalYYYYMMDD(today);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-        const checkoutStr = getLocalYYYYMMDD(tomorrow);
         
-        // ตรวจสอบว่าวันนี้ถูกจองหรือยัง
-        const bookedDates = data.bookedDates || [];
-        if (bookedDates.includes(checkinStr)) {
-            await Swal.fire({
-                title: '❌ ห้องไม่ว่าง',
-                text: 'ขออภัย คืนนี้ห้องเต็มแล้วค่ะ',
+        // เช็คว่าวันนี้เต็มหรือยัง
+        if (data.bookedDates && data.bookedDates.includes(checkinStr)) {
+            Swal.fire({
+                title: '❌ คืนนี้เต็มแล้ว',
+                text: 'ขออภัยค่ะ มีผู้เข้าพักท่านอื่นจองตัดหน้าไปแล้ว',
                 icon: 'error',
                 background: '#111',
-                color: '#fff',
-                confirmButtonText: 'ตกลง'
+                color: '#fff'
             });
             btn.disabled = false;
             btn.innerHTML = "⚡ Fast Check-in (คืนนี้)";
             return;
         }
-        
-        const currentPrice = data.price || localStorage.getItem("latest_price") || 2200;
-        
+
+        // ถ้าว่าง ให้ไปหน้าชำระเงิน
+        const currentPrice = data.price || "1251.21";
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
         const bookingInfo = {
-            name: "Fast Check-in",
-            phone: "",
-            line: "",
             checkin: checkinStr,
-            checkout: checkoutStr,
-            nights: 1,
+            checkout: getLocalYYYYMMDD(tomorrow),
             totalPrice: currentPrice,
-            type: "Fast Check-in",
-            timestamp: new Date().toISOString(),
-            status: "pending"
+            type: "Fast Check-in"
         };
-        
+
         localStorage.setItem("pendingBooking", JSON.stringify(bookingInfo));
+        // ส่งต่อไปยังหน้าชำระเงิน (ระบุชื่อไฟล์ให้ถูก)
         window.location.href = "payment.html";
-        
+
     } catch (error) {
-        console.error(error);
-        await Swal.fire({
-            title: 'เชื่อมต่อไม่สำเร็จ',
-            text: 'กรุณาตรวจสอบอินเทอร์เน็ต หรือลองอีกครั้ง',
-            icon: 'error',
-            background: '#111',
-            color: '#fff'
-        });
+        Swal.fire({ title: 'เกิดข้อผิดพลาด', text: 'กรุณาลองใหม่อีกครั้ง', icon: 'error' });
         btn.disabled = false;
         btn.innerHTML = "⚡ Fast Check-in (คืนนี้)";
     }
 }
 
-function confirmFastCheckIn() {
-    Swal.fire({
-        title: 'ยืนยันการจอง',
-        text: "คุณต้องการเข้าพักคืนนี้ใช่ไหม?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#ffffff',
-        cancelButtonColor: '#333',
-        confirmButtonText: '✅ ใช่ จองเลย',
-        cancelButtonText: '❌ ยกเลิก',
-        background: '#111',
-        color: '#fff',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fastCheckIn();
-        }
-    });
-}
-
-// เมื่อโหลดหน้า
+// ผูกฟังก์ชันกับปุ่มเมื่อโหลดหน้าเว็บ
 document.addEventListener('DOMContentLoaded', function() {
     syncRoomData();
     
     const btn = document.getElementById('btnFastCheckin');
     if (btn) {
-        btn.addEventListener('click', confirmFastCheckIn);
+        btn.addEventListener('click', () => {
+            Swal.fire({
+                title: 'ยืนยันเข้าพักคืนนี้?',
+                text: "ระบบจะพาคุณไปหน้าชำระเงินทันที",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                background: '#111',
+                color: '#fff',
+                confirmButtonColor: '#fff',
+                confirmButtonTextColor: '#000'
+            }).then((result) => {
+                if (result.isConfirmed) fastCheckIn();
+            });
+        });
     }
 });
 </script>
-</body>
-</html>
