@@ -1,76 +1,30 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Manager Panel - Thonglor 7</title>
-<script src="config.js"></script>
-<style>
-/* ธีม OLED Black ประหยัดไฟ iPhone 13 Pro Max */
-body{margin:0;font-family:-apple-system,sans-serif;background:#000;color:#fff;text-align:center;}
-.header-img{width:100%;height:220px;object-fit:cover;filter:brightness(0.4);}
-.box{background:#111;margin:-25px auto 30px;padding:25px;border-radius:24px;max-width:420px;border:1px solid #222;box-shadow:0 10px 40px rgba(0,0,0,0.8);position:relative;}
-h2{margin-top:0;font-size:20px;border-bottom:1px solid #333;padding-bottom:15px;letter-spacing:1px;}
-.section{margin-bottom:20px;text-align:left;background:#1a1a1a;padding:15px;border-radius:14px;border:1px solid #222;}
-.section-title{font-size:13px;color:#888;font-weight:bold;margin-bottom:12px;text-transform:uppercase;}
-.price-group{display:flex;align-items:center;background:#222;border:1px solid #333;border-radius:12px;overflow:hidden;}
-.price-group input{width:60%;border:none;padding:14px;font-size:20px;text-align:right;outline:none;background:transparent;color:#fff;}
-.price-group .fixed-unit{width:40%;background:#333;padding:14px;font-size:18px;color:#aaa;text-align:left;border-left:1px solid #444;font-weight:bold;}
-select{width:100%;padding:14px;font-size:16px;border:1px solid #333;border-radius:12px;background:#222;color:#fff;margin-bottom:10px;outline:none;}
-.btn{width:100%;padding:16px;font-size:16px;font-weight:bold;border:none;border-radius:12px;cursor:pointer;margin-top:5px;transition:0.2s;}
-.btn:active{transform:scale(0.98);}
-.primary{background:#fff;color:#000;}
-.danger{background:#400;color:#ff4d4f;border:1px solid #600;}
-.door-btn{background:linear-gradient(135deg, #800 0%, #400 100%);color:white;height:80px;font-size:22px;border:1px solid #a00;box-shadow:0 4px 20px rgba(139,0,0,0.5);}
-.line-btn{background:#064321;color:#06C755;border:1px solid #085a2c;margin-bottom:10px;}
-</style>
-</head>
-
-<body>
-
-<img src="building.PNG" class="header-img">
-<div class="box">
-    <h2>MANAGER CONTROL PANEL</h2>
-
-    <div class="section" style="background:#200; border-color:#400;">
-        <div class="section-title" style="color:#ff4d4f;">🔓 FRONT DOOR CONTROL</div>
-        <button id="doorBtn" class="btn door-btn" onclick="openDoor()">PUSH TO OPEN</button>
-        <div id="doorStatus" style="font-size:12px; color:#666; margin-top:10px; text-align:center;">STATUS: READY</div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">1. SET ROOM PRICE (บาท)</div>
-        <div class="price-group">
-            <input type="number" id="basePrice" placeholder="เช่น 1500" step="1">
-            <div class="fixed-unit">THB</div>
-        </div>
-        <button class="btn primary" onclick="updatePrice()" style="margin-top:15px;">💾 SAVE TO SHEETS</button>
-    </div>
-
-    <div class="section">
-        <div class="section-title">2. STAFF NOTIFICATION</div>
-        <a href="https://line.me/R/msg/text/?เรียกแม่บ้านครับ" style="text-decoration:none;">
-            <button class="btn line-btn">🧹 CALL MAID (เรียกแม่บ้าน)</button>
-        </a>
-        <a href="https://line.me/R/msg/text/?ส่งซักผ้าครับ" style="text-decoration:none;">
-            <button class="btn line-btn">🧺 LAUNDRY (ส่งซักผ้า)</button>
-        </a>
-    </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+// 1. ฟังก์ชันเปิดประตู (ของเดิมบอสโอเคแล้ว แต่เจนนี่จูนให้สมูทขึ้น)
 async function openDoor() {
     const btn = document.getElementById("doorBtn");
     const status = document.getElementById("doorStatus");
     
-    if(!confirm("ยืนยันเปิดประตูหน้าบ้านใช่ไหมคะบอส?")) return;
+    const result = await Swal.fire({
+        title: 'ยืนยันเปิดประตู?',
+        text: "บอสกำลังจะสั่งปลดล็อกประตูหน้าบ้านนะคะ",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#800',
+        cancelButtonColor: '#333',
+        confirmButtonText: 'ใช่, เปิดเลย!',
+        cancelButtonText: 'ยกเลิก',
+        background: '#111',
+        color: '#fff'
+    });
+
+    if (!result.isConfirmed) return;
 
     btn.disabled = true;
     status.innerText = "⏳ SENDING SIGNAL...";
     status.style.color = "#ff9100";
 
     try {
-        // ใช้ API_URL จาก config.js พร้อมพ่วงคำสั่งเปิดประตู
         await fetch(`${API_URL}?action=openDoor`, { mode: 'no-cors' });
         status.innerText = "✅ SUCCESS! DOOR OPENED";
         status.style.color = "#8fce00";
@@ -81,22 +35,54 @@ async function openDoor() {
             btn.disabled = false;
         }, 5000);
     } catch (e) {
-        alert("ERROR: " + e);
+        Swal.fire({ title: 'Error!', text: e, icon: 'error', background:'#111', color:'#fff' });
         btn.disabled = false;
-        status.innerText = "STATUS: READY";
     }
 }
 
-function updatePrice() {
+// 2. ฟังก์ชันแก้ไขราคา (จุดที่เคยลักไก่ คราวนี้ส่งจริง!)
+async function updatePrice() {
     const price = document.getElementById("basePrice").value;
+    
     if(!price || price < 1) {
-        alert("กรุณาใส่ราคาให้ถูกต้องค่ะบอส");
+        Swal.fire({ title: 'ราคาไม่ถูกต้อง!', text: 'กรุณาใส่ตัวเลขราคาด้วยค่ะบอส', icon: 'error', background:'#111', color:'#fff' });
         return;
     }
-    // ในอนาคตบอสสามารถเขียนฟังก์ชันเพิ่มเพื่อยิง API ไปอัปเดตค่าในช่อง B1 ของ Sheets ได้จากที่นี่เลยค่ะ
-    alert("บันทึกราคาใหม่: " + price + " บาท เรียบร้อย! อย่าลืมไปเช็กใน Sheets นะคะบอส");
+
+    // แสดงสถานะว่ากำลังส่งข้อมูล
+    Swal.fire({
+        title: 'กำลังบันทึก...',
+        text: 'เตารีดเจนนี่กำลังนาบราคาลง Sheets ค่ะ',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); },
+        background: '#111',
+        color: '#fff'
+    });
+
+    try {
+        // ยิง API ของจริงไปที่ Google Sheets (Action: updatePrice)
+        const response = await fetch(`${API_URL}?action=updatePrice&price=${price}`);
+        const result = await response.text();
+
+        Swal.fire({
+            title: 'สำเร็จ!',
+            text: `ปรับราคาที่ทองหล่อ 7 เป็น ${price} บาท เรียบร้อยแล้วค่ะ!`,
+            icon: 'success',
+            background: '#111',
+            color: '#fff'
+        });
+        
+        // ล้างราคาเก่าในเครื่องเพื่อให้หน้า Index ดึงใหม่
+        localStorage.removeItem("latest_price");
+
+    } catch (error) {
+        Swal.fire({
+            title: 'บันทึกไม่สำเร็จ!',
+            text: 'ตรวจสอบเน็ตหรือ API_URL ใน config.js นะคะบอส',
+            icon: 'error',
+            background: '#111',
+            color: '#fff'
+        });
+    }
 }
 </script>
-
-</body>
-</html>
