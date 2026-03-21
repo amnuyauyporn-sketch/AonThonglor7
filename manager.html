@@ -9,14 +9,19 @@
 <style>
 /* OLED Black Professional Style - iPhone 13 Pro Max */
 body{margin:0;font-family:-apple-system,sans-serif;background:#000;color:#fff;text-align:center;padding-bottom:60px;}
-.header-img{width:100%;height:220px;object-fit:cover;filter:brightness(0.3);}
+/* รูปสว่าง 100% ตามต้นฉบับบอส ห้ามมืดเด็ดขาด */
+.header-img{width:100%;height:220px;object-fit:cover;}
 .box{background:#111;margin:-25px auto 30px;padding:25px;border-radius:24px;max-width:420px;border:1px solid #222;position:relative;}
 h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;color:#888;}
 .section{margin-bottom:20px;text-align:left;background:#1a1a1a;padding:15px;border-radius:14px;border:1px solid #222;}
 .section-title{font-size:12px;color:#666;font-weight:bold;margin-bottom:12px;text-transform:uppercase;}
 .price-group{display:flex;align-items:center;background:#222;border:1px solid #333;border-radius:12px;overflow:hidden;}
-.price-group input{width:60%;border:none;padding:14px;font-size:20px;text-align:right;background:transparent;color:#fff;outline:none;}
-.price-group .fixed-unit{width:40%;background:#333;padding:14px;font-size:16px;color:#888;text-align:left;border-left:1px solid #444;}
+
+/* ช่องกรอกที่ลูกน้องแก้ได้แค่หลักพัน/ร้อย/สิบ (ล็อกหลักหน่วยเป็น 0) */
+.price-group input{width:50%;border:none;padding:14px;font-size:24px;text-align:right;background:transparent;color:#fff;outline:none;}
+/* ส่วนหลักหน่วยและทศนิยม (0.00) ที่ระบบบอสจะมาจัดการเอง */
+.price-group .fixed-unit{width:50%;background:#333;padding:14px;font-size:24px;color:#aaa;text-align:left;border-left:1px solid #444;font-weight:bold;letter-spacing:2px;}
+
 .btn{width:100%;padding:16px;font-size:16px;font-weight:bold;border:none;border-radius:12px;cursor:pointer;margin-top:5px;}
 .primary{background:#fff;color:#000;}
 .door-btn{background:#400;color:#fff;height:70px;font-size:20px;border:1px solid #600;}
@@ -36,10 +41,10 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
     </div>
 
     <div class="section">
-        <div class="section-title">💰 SET ROOM PRICE (X.xx)</div>
+        <div class="section-title">💰 ROOM PRICE (แก้หลักพัน/ร้อย/สิบ)</div>
         <div class="price-group">
-            <input type="number" id="basePrice" placeholder="0.00" step="0.01" onchange="this.value = parseFloat(this.value).toFixed(2)">
-            <div class="fixed-unit">THB</div>
+            <input type="number" id="basePrice" placeholder="เช่น 123" step="10" oninput="this.value = Math.floor(this.value/10)*10">
+            <div class="fixed-unit">0.00 THB</div>
         </div>
         <button class="btn primary" onclick="updatePrice()" style="margin-top:10px;">UPDATE PRICE</button>
     </div>
@@ -55,19 +60,20 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
 async function updatePrice() {
     let priceInput = document.getElementById("basePrice").value;
     if(!priceInput || priceInput < 0) {
-        Swal.fire({ title: 'ระบุราคาด้วยค่ะบอส', icon: 'error', background: '#111', color: '#fff' });
+        Swal.fire({ title: 'ระบุตัวเลขด้วยค่ะบอส', icon: 'error', background: '#111', color: '#fff' });
         return;
     }
 
-    // รีดให้เป็นทศนิยม 2 ตำแหน่ง (X.xx) ก่อนส่งไป Sheets
-    const formattedPrice = parseFloat(priceInput).toFixed(2);
+    // ล็อกหลักหน่วยเป็น 0 และทศนิยมเป็น .00 เพื่อให้ระบบบอสจัดการต่อเอง
+    // เช่น กรอก 1230 จะส่งไปเป็น 1230.00
+    const finalVal = parseInt(priceInput).toFixed(2);
 
     try {
-        const response = await fetch(`${API_URL}?action=updatePrice&price=${formattedPrice}`);
+        await fetch(`${API_URL}?action=updatePrice&price=${finalVal}`);
         
         Swal.fire({
             title: 'Updated!',
-            text: `ราคาถูกบันทึกเป็น ${formattedPrice} THB`,
+            text: `ส่งค่า ${finalVal} ไปยังระบบ (เว้น 0.00 ไว้ให้ระบบบอส)`,
             icon: 'success',
             toast: true,
             position: 'top',
