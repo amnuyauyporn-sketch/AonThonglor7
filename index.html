@@ -21,7 +21,7 @@ h1{font-size:36px;margin:10px 0;}
 .button.secondary{background:#000;color:#444;border:1px solid #222;}
 .button:disabled {background:#444;color:#888;cursor:not-allowed;}
 .map{margin-top:40px;border-radius:20px;overflow:hidden;border:1px solid #333;}
-/* สไตล์แผนที่ของบอส - เอา filter grayscale/invert ออกทั้งหมด */
+/* แผนที่สว่างสดใส 100% ไม่ใส่ Filter เหี้ยอะไรทั้งนั้น */
 iframe{width:100%;height:350px;border:0;}
 </style>
 </head>
@@ -72,7 +72,7 @@ async function syncPrice() {
         const response = await fetch(`${API_URL}?action=getPrice&t=${new Date().getTime()}`);
         const data = await response.json();
         
-        // ดึงราคา/รหัส X.xx ของบอสตรงๆ ไม่ต้องปัดเศษ
+        // ดึงราคา/รหัส X.xx ของบอสตรงๆ ไม่ต้องปัดเศษเพื่อให้ทศนิยมไม่หาย
         if(data && data.price) {
             document.getElementById("displayPrice").innerText = data.price;
             localStorage.setItem("latest_price", data.price);
@@ -113,7 +113,6 @@ async function fastCheckIn() {
   btn.innerText = "Checking...";
 
   try {
-    // 3. เรียก API_URL เพื่อเช็กสถานะล่าสุด
     const response = await fetch(`${API_URL}?action=getPrice`);
     const data = await response.json(); 
     
@@ -122,15 +121,14 @@ async function fastCheckIn() {
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
 
-    // เช็กสถานะห้องว่าง
+    // ดักสถานะห้องว่าง
     if(data.bookedDates && data.bookedDates.includes(checkinStr)) {
-       Swal.fire({ title: 'Full!', text: 'วันนี้ห้องเต็มแล้วค่ะ', icon: 'error', background:'#111', color:'#fff' });
+       Swal.fire({ title: 'Full!', text: 'วันนี้ห้องเต็มแล้วค่ะบอส', icon: 'error', background:'#111', color:'#fff' });
        btn.disabled = false;
        btn.innerText = "Fast Check-in (เข้าพักวันนี้)";
        return; 
     }
     
-    // ใช้ราคาจาก Sheets บันทึกลงเครื่องเพื่อไปหน้าจ่ายเงิน
     const currentPrice = data.price || localStorage.getItem("latest_price") || "1500.00";
     const bookingData = {
       name: "Fast Guest",
