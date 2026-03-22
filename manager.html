@@ -30,10 +30,12 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
 <img src="building.PNG" class="header-img">
 <div class="box">
     <h2>SYSTEM CONTROL PANEL</h2>
+
     <div class="section">
         <div class="section-title">🔓 DOOR CONTROL</div>
         <button id="doorBtn" class="btn door-btn" onclick="openDoor()">OPEN FRONT DOOR</button>
     </div>
+
     <div class="section">
         <div class="section-title">📅 RECENT BOOKINGS</div>
         <table class="booking-list">
@@ -41,6 +43,7 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
             <tbody id="bookingBody"><tr><td colspan="3" style="text-align:center;">กำลังดึงข้อมูล...</td></tr></tbody>
         </table>
     </div>
+
     <div class="section">
         <div class="section-title">💰 WEEKDAY PRICE (B1)</div>
         <div class="price-group">
@@ -49,6 +52,7 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
         </div>
         <button class="btn primary" onclick="updatePrice('weekday')">UPDATE WEEKDAY</button>
     </div>
+
     <div class="section">
         <div class="section-title" style="color:#ff4444;">🔥 WEEKEND PRICE (C1-E1)</div>
         <select id="weekendDaySelect" class="date-selector">
@@ -63,7 +67,14 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
         </div>
         <button class="btn weekend-btn" onclick="updatePrice('weekend')">UPDATE WEEKEND PRICE</button>
     </div>
+
+    <div class="section">
+        <div class="section-title">📞 STAFF SERVICE</div>
+        <a href="https://line.me/R/msg/text/?เรียกแม่บ้าน" class="line-btn">CALL MAID</a>
+        <a href="https://line.me/R/msg/text/?ส่งซักผ้า" class="line-btn">LAUNDRY SERVICE</a>
+    </div>
 </div>
+
 <script>
 async function loadData() {
     if (typeof API_URL === 'undefined') return;
