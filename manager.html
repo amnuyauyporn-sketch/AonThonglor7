@@ -19,13 +19,16 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
 .booking-list th{color:#444;text-align:left;padding:8px;border-bottom:1px solid #222;}
 .booking-list td{padding:12px 8px;border-bottom:1px solid #1a1a1a;color:#ccc;}
 
-/* Price Group */
-.price-group{display:flex;align-items:center;background:#222;border:1px solid #333;border-radius:12px;overflow:hidden;}
+/* Price Group & Select */
+.price-group{display:flex;align-items:center;background:#222;border:1px solid #333;border-radius:12px;overflow:hidden;margin-bottom:10px;}
 .price-group input{width:50%;border:none;padding:14px;font-size:24px;text-align:right;background:transparent;color:#fff;outline:none;}
 .price-group .fixed-unit{width:50%;background:#333;padding:14px;font-size:24px;color:#aaa;text-align:left;border-left:1px solid #444;font-weight:bold;}
 
+.date-selector{width:100%;padding:12px;font-size:14px;background:#222;color:#fff;border:1px solid #333;border-radius:12px;margin-bottom:12px;outline:none;cursor:pointer;}
+
 .btn{width:100%;padding:16px;font-size:16px;font-weight:bold;border:none;border-radius:12px;cursor:pointer;margin-top:5px;}
 .primary{background:#fff;color:#000;}
+.weekend-btn{background:#400;color:#fff;border:1px solid #600;}
 .door-btn{background:#400;color:#fff;height:70px;font-size:20px;border:1px solid #600;}
 .line-btn{background:#111;color:#06C755;border:1px solid #222;margin-bottom:10px;text-decoration:none;display:block;text-align:center;line-height:45px;border-radius:12px;}
 </style>
@@ -54,12 +57,27 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
     </div>
 
     <div class="section">
-        <div class="section-title">💰 ROOM PRICE (พัน/ร้อย/สิบ)</div>
+        <div class="section-title">💰 WEEKDAY PRICE (MON-THU)</div>
         <div class="price-group">
-            <input type="number" id="basePrice" placeholder="000">
+            <input type="number" id="weekdayPrice" placeholder="185">
             <div class="fixed-unit">0.00 THB</div>
         </div>
-        <button class="btn primary" onclick="updatePrice()" style="margin-top:10px;">UPDATE PRICE</button>
+        <button class="btn primary" onclick="updatePrice('weekday')">UPDATE WEEKDAY (B1)</button>
+    </div>
+
+    <div class="section">
+        <div class="section-title" style="color:#ff4444;">🔥 WEEKEND PRICE (FRI-SUN)</div>
+        <select id="weekendDaySelect" class="date-selector">
+            <option value="all">อัปเดตทั้ง 3 วัน (C1, D1, E1)</option>
+            <option value="fri">เฉพาะวันศุกร์ (C1)</option>
+            <option value="sat">เฉพาะวันเสาร์ (D1)</option>
+            <option value="sun">เฉพาะวันอาทิตย์ (E1)</option>
+        </select>
+        <div class="price-group">
+            <input type="number" id="weekendPrice" placeholder="220">
+            <div class="fixed-unit">0.00 THB</div>
+        </div>
+        <button class="btn weekend-btn" onclick="updatePrice('weekend')">UPDATE WEEKEND PRICE</button>
     </div>
 
     <div class="section">
@@ -70,7 +88,6 @@ h2{margin-top:0;font-size:18px;border-bottom:1px solid #333;padding-bottom:15px;
 </div>
 
 <script>
-// ดึงค่าจาก API_URL ที่ประกาศไว้ใน config.js เท่านั้น ห้ามประกาศ API_URL ซ้ำตรงนี้
 async function loadData() {
     if (typeof API_URL === 'undefined') return;
     try {
@@ -78,7 +95,6 @@ async function loadData() {
         const data = await res.json();
         const body = document.getElementById("bookingBody");
         body.innerHTML = "";
-        
         if (data.recent && data.recent.length > 0) {
             data.recent.forEach(item => {
                 body.innerHTML += `<tr><td>${item.date}</td><td>${item.name || '-'}</td><td>${item.type || 'Fast'}</td></tr>`;
@@ -91,10 +107,24 @@ async function loadData() {
     }
 }
 
-async function updatePrice() {
-    let priceInput = document.getElementById("basePrice").value;
+async function updatePrice(mode) {
+    let priceInput, action;
+    
+    if(mode === 'weekday') {
+        priceInput = document.getElementById("weekdayPrice").value;
+        action = "updateWeekday";
+    } else {
+        priceInput = document.getElementById("weekendPrice").value;
+        let dayTarget = document.getElementById("weekendDaySelect").value;
+        // แยก action ตาม dropdown
+        if(dayTarget === "all") action = "updateWeekend";
+        else if(dayTarget === "fri") action = "updateFriday";
+        else if(dayTarget === "sat") action = "updateSaturday";
+        else if(dayTarget === "sun") action = "updateSunday";
+    }
+
     if(!priceInput) {
-        Swal.fire({ title: 'ระบุเลข 3 หลักด้วยค่ะบอส', icon: 'error', background: '#111', color: '#fff' });
+        Swal.fire({ title: 'ระบุราคาด้วยค่ะพี่ขา', icon: 'error', background: '#111', color: '#fff' });
         return;
     }
 
@@ -102,11 +132,12 @@ async function updatePrice() {
     Swal.fire({ title: 'กำลังอัปเดต...', background: '#111', color: '#fff', didOpen: () => Swal.showLoading() });
 
     try {
-        const res = await fetch(`${API_URL}?action=updatePrice&price=${finalVal}`);
+        const res = await fetch(`${API_URL}?action=${action}&price=${finalVal}`);
         const data = await res.json();
         if(data.status === "success") {
             Swal.fire({ title: 'Updated!', text: `ราคาใหม่: ${finalVal}`, icon: 'success', timer: 2000, showConfirmButton: false, background: '#111', color: '#fff' });
-            document.getElementById("basePrice").value = "";
+            if(mode === 'weekday') document.getElementById("weekdayPrice").value = "";
+            else document.getElementById("weekendPrice").value = "";
         }
     } catch (e) {
         Swal.fire({ title: 'Error', text: 'เชื่อมต่อชีทไม่ได้', icon: 'error', background: '#111', color: '#fff' });
