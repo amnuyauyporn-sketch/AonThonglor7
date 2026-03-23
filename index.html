@@ -40,13 +40,12 @@
         .price-value { font-size: 36px; font-weight: 800; color: #fff; }
         .price-value small { font-size: 16px; font-weight: 400; color: #888; }
         
-        /* ปรับปรุง Badge ความปลอดภัยตามสั่งพี่ขา */
+        /* Badge แบบคลีนๆ ตามสั่งพี่ขา */
         .checkin-badge { 
-            display: flex; flex-direction: column; gap: 6px;
             background: #1a1a1a; padding: 12px 16px; border-radius: 20px; 
             font-size: 14px; color: #ccc; margin-bottom: 16px; border: 1px solid #333;
+            text-align: center;
         }
-        .badge-item { display: flex; align-items: center; gap: 8px; }
         
         .facilities { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; justify-content: center; }
         .facility-item { background: #1a1a1a; padding: 8px 14px; border-radius: 30px; font-size: 12px; color: #ddd; border: 1px solid #222; }
@@ -62,18 +61,9 @@
             border-radius: 60px; font-weight: 600; border: 1px solid #333; text-decoration: none; 
         }
 
-        /* CSS ปุ่ม Pop-up ปุ่มน้ำเงินยาวล่อนิ้ว */
-        .swal2-styled.btn-confirm-long {
-            width: 150px !important; 
-            font-weight: 700 !important;
-            border-radius: 12px !important;
-        }
-        .swal2-styled.btn-cancel-short {
-            width: 100px !important; 
-            border-radius: 12px !important;
-        }
+        .swal2-styled.btn-confirm-long { width: 150px !important; font-weight: 700 !important; border-radius: 12px !important; }
+        .swal2-styled.btn-cancel-short { width: 100px !important; border-radius: 12px !important; }
 
-        /* แมพของพี่ - ห้ามยุ่งเด็ดขาด */
         .map-container { margin: 32px 0; border-radius: 28px; overflow: hidden; border: 1px solid #2a2a2a; }
         .footer-note { text-align: center; font-size: 12px; color: #555; margin-top: 24px; }
     </style>
@@ -96,8 +86,7 @@
     </div>
     
     <div class="checkin-badge">
-        <div class="badge-item">🕒 <b>Self Check-in 24 ชม.</b> ปลอดภัย มั่นใจ</div>
-        <div class="badge-item">🔐 <b>ประตูคีย์การ์ด & กล้องวงจรปิด CCTV</b> ตลอด 24 ชม.</div>
+        🕒 <b>Self Check-in</b> • 🔐 <b>Keycard</b> • 🎥 <b>CCTV</b>
     </div>
     
     <div class="facilities">
@@ -105,8 +94,6 @@
         <span class="facility-item">❄️ แอร์เย็น</span>
         <span class="facility-item">🚿 น้ำร้อน</span>
         <span class="facility-item">🧊 ตู้เย็น</span>
-        <span class="facility-item">🎥 CCTV 24hr</span>
-        <span class="facility-item">💳 Keycard Access</span>
     </div>
 
     <button class="btn-primary" id="btnFastCheckin">⚡ Fast Check-in (คืนนี้)</button>
