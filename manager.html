@@ -91,11 +91,13 @@ async function loadData() {
     try {
         const res = await fetch(`${API_URL}?action=getPrice`);
         const data = await res.json();
-        correctPass = data.pw.toString(); // ดึง PIN จากชีทมาเก็บไว้
+        
+        // เก็บ PIN จากช่อง I1 (Index 7) มาถือไว้ในเครื่อง
+        correctPass = data.pw ? data.pw.toString() : "";
         
         const body = document.getElementById("bookingBody");
         body.innerHTML = "";
-        if (data.recent) {
+        if (data.recent && data.recent.length > 0) {
             data.recent.forEach(item => {
                 body.innerHTML += `<tr><td>${item.date}</td><td>${item.name || '-'}</td><td>${item.type || 'Fast'}</td></tr>`;
             });
@@ -104,11 +106,10 @@ async function loadData() {
         document.getElementById("weekendPrice").placeholder = Math.floor(data.fri / 10);
         document.getElementById("weekdayStatus").innerHTML = `จ: ${data.mon} | อ: ${data.tue} | พ: ${data.wed} | พฤ: ${data.thu}`;
         document.getElementById("weekendStatus").innerHTML = `ศุกร์: ${data.fri} | เสาร์: ${data.sat} | อาทิตย์: ${data.sun}`;
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error("Error loading data:", e); }
 }
 
 async function updatePrice(mode) {
-    // ถามรหัสผ่านก่อนทำงาน
     const { value: password } = await Swal.fire({
         title: '🔒 ENTER PIN',
         input: 'password',
