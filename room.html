@@ -4,84 +4,82 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ตั้งค่าสีหลักของห้องตรงนี้ (พี่เปลี่ยนตามห้องได้เลย เช่น purple, blue, green, yellow) */
-    :root { --room-color: purple; --room-glow: rgba(128, 0, 128, 0.5); }
-
+    :root { --room-purple: #e0b0ff; }
     body { background-color: #000; color: #fff; font-family: sans-serif; padding: 15px; text-align: center; }
     
-    .welcome-section { margin: 5px 0 15px 0; border-bottom: 1px solid #222; padding-bottom: 10px; }
-    .welcome { color: var(--room-color); letter-spacing: 3px; font-size: 1.5rem; font-weight: bold; }
-    .customer-name { font-size: 1rem; color: #888; text-transform: uppercase; }
-    
-    .room-header { font-size: 2.5rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--room-glow); margin: 0; }
+    .room-header { font-size: 2.5rem; font-weight: bold; color: var(--room-purple); margin: 10px 0 0 0; }
     .floor-info { color: #555; font-size: 0.9rem; margin-bottom: 10px; }
-    
-    .nav-box { border: 1px solid var(--room-color); padding: 10px; border-radius: 10px; margin-bottom: 15px; background: #0a000a; color: var(--room-color); font-size: 0.85rem; }
+    .nav-box { border: 1px solid #303; padding: 10px; border-radius: 10px; margin-bottom: 15px; background: #101; color: var(--room-purple); font-size: 0.85rem; }
 
     .btn { width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; }
     .btn-door { background: #fff; color: #000; }
 
-    /* AC Section (Compact) */
-    .control-card { background: #111; border: 1px solid #333; border-radius: 15px; padding: 12px; margin-bottom: 10px; }
-    .ac-row { display: flex; align-items: center; justify-content: space-between; }
-    .temp-display { font-size: 2rem; font-weight: bold; color: var(--room-color); }
+    .control-card { background: #111; border: 1px solid #444; border-radius: 15px; padding: 10px 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; height: 125px; }
+    
+    .display-box { width: 95px; text-align: left; display: flex; align-items: center; justify-content: flex-start; }
+    .temp-text { font-size: 3.8rem; font-weight: bold; color: var(--room-purple); line-height: 1; }
+    .degree-symbol { font-size: 1.8rem; vertical-align: top; margin-top: 5px; color: var(--room-purple); }
+    
+    .color-picker { width: 80px; height: 80px; border: none; background: transparent; cursor: pointer; -webkit-appearance: none; }
+    .color-picker::-webkit-color-swatch { border-radius: 50%; border: 3px solid #fff; }
+    
+    .center-ctrl { width: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+    .small-btn { width: 48px; height: 45px; border-radius: 6px; border: 1.5px solid var(--room-purple); background: transparent; color: var(--room-purple); font-size: 1.5rem; font-weight: bold; cursor: pointer; }
+    .slider-v { -webkit-appearance: slider-vertical; width: 32px; height: 95px; background: #444; }
 
-    /* Yeelight Control (New!) */
-    .light-row { display: flex; gap: 10px; margin-top: 10px; }
-    .slider { width: 100%; height: 8px; border-radius: 5px; background: #333; outline: none; -webkit-appearance: none; margin: 15px 0; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--room-color); cursor: pointer; box-shadow: 0 0 10px var(--room-color); }
+    .power-group { width: 145px; display: flex; flex-direction: column; gap: 10px; margin-left: 8px; }
+    .power-btn { width: 100%; height: 48px; border-radius: 8px; border: none; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
 
-    label { display: block; margin-top: 10px; color: #444; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; text-align: left; }
+    label { display: block; margin-top: 20px; color: #bbb; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2.5px; text-align: left; border-left: 3px solid var(--room-purple); padding-left: 10px; }
+
+    .comment-area { width: 100%; background: #111; border: 1px solid #444; border-radius: 10px; color: #fff; padding: 12px; font-size: 0.9rem; box-sizing: border-box; margin-top: 8px; resize: none; }
+    .btn-send { background: var(--room-purple); color: #000; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <div class="welcome-section">
-    <div class="welcome">WELCOME</div>
-    <div id="cName" class="customer-name">GUEST</div>
-  </div>
-
   <div class="room-header">ROOM 101</div>
   <div class="floor-info">FLOOR 1</div>
-  
   <div class="nav-box">เดินตามไฟนำทางสีม่วง</div>
 
   <button class="btn btn-door" onclick="send('openDoor')">OPEN MAIN DOOR</button>
 
   <label>Air Conditioning</label>
   <div class="control-card">
-    <div class="ac-row">
-      <button onclick="send('airOn')" style="background:var(--room-color); border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">ON</button>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button onclick="changeTemp(-1)" style="background:none; border:1px solid #444; color:#fff; width:35px; height:35px; border-radius:50%; font-size:1.2rem;">−</button>
-        <span class="temp-display"><span id="temp">25</span>°</span>
-        <button onclick="changeTemp(1)" style="background:none; border:1px solid #444; color:#fff; width:35px; height:35px; border-radius:50%; font-size:1.2rem;">+</button>
-      </div>
-      <button onclick="send('airOff')" style="background:#200; color:#f44; border:1px solid #400; padding:8px 15px; border-radius:5px; font-weight:bold;">OFF</button>
+    <div class="display-box"><span class="temp-text" id="temp">25</span><span class="degree-symbol">°</span></div>
+    <div class="center-ctrl">
+      <button class="small-btn" onclick="changeTemp(1)">+</button>
+      <button class="small-btn" onclick="changeTemp(-1)">−</button>
+    </div>
+    <div class="power-group">
+      <button class="power-btn" style="background: var(--room-purple); color: #000;" onclick="send('airOn')">ON</button>
+      <button class="power-btn" style="background: #300; color: #f66; border: 1px solid #600;" onclick="send('airOff')">OFF</button>
     </div>
   </div>
 
-  <label>Yeelight - Room Light</label>
+  <label>Bed Lighting</label>
   <div class="control-card">
-    <div class="light-row">
-      <button class="btn" style="background:#222; color:#fff; margin:0;" onclick="send('lightOn')">ON</button>
-      <button class="btn" style="background:#000; color:#444; border:1px solid #222; margin:0;" onclick="send('lightOff')">OFF</button>
-    </div>
-    
-    <div style="text-align:left; padding-top:10px;">
-      <span style="font-size:0.7rem; color:#666;">BRIGHTNESS</span>
-      <input type="range" class="slider" min="1" max="100" value="80" onchange="send('lightBri', this.value)">
-    </div>
-
-    <div style="text-align:left;">
-      <span style="font-size:0.7rem; color:#666;">ROOM SCENE</span>
-      <div class="light-row">
-        <button onclick="send('lightColor', 'purple')" style="flex:1; background:purple; height:30px; border-radius:5px; border:none;"></button>
-        <button onclick="send('lightColor', 'blue')" style="flex:1; background:blue; height:30px; border-radius:5px; border:none;"></button>
-        <button onclick="send('lightColor', 'white')" style="flex:1; background:white; height:30px; border-radius:5px; border:none;"></button>
-      </div>
+    <div class="display-box"><input type="color" class="color-picker" value="#e0b0ff" onchange="send('bedColor', this.value)"></div>
+    <div class="center-ctrl"><input type="range" class="slider-v" min="1" max="100" value="80" orient="vertical" onchange="send('bedBri', this.value)"></div>
+    <div class="power-group">
+      <button class="power-btn" style="background: #fff; color: #000;" onclick="send('bedOn')">ON</button>
+      <button class="power-btn" style="background: #222; color: #666; border: 1px solid #444;" onclick="send('bedOff')">OFF</button>
     </div>
   </div>
+
+  <label>Bath Lighting</label>
+  <div class="control-card">
+    <div class="display-box"><input type="color" class="color-picker" value="#ffc0cb" onchange="send('bathColor', this.value)"></div>
+    <div class="center-ctrl"><input type="range" class="slider-v" min="1" max="100" value="100" orient="vertical" onchange="send('bathBri', this.value)"></div>
+    <div class="power-group">
+      <button class="power-btn" style="background: #fff; color: #000;" onclick="send('bathOn')">ON</button>
+      <button class="power-btn" style="background: #222; color: #666; border: 1px solid #444;" onclick="send('bathOff')">OFF</button>
+    </div>
+  </div>
+
+  <label>Suggestions (คำติชม)</label>
+  <textarea id="comment" class="comment-area" rows="3" placeholder="Write your feedback here..."></textarea>
+  <button class="btn btn-send" onclick="sendComment()">SEND FEEDBACK</button>
 
   <script>
     let currentTemp = 25;
@@ -90,11 +88,24 @@
       if(currentTemp < 18) currentTemp = 18;
       if(currentTemp > 30) currentTemp = 30;
       document.getElementById('temp').innerText = currentTemp;
-      send('airSet', currentTemp); 
+      send('airSet' + currentTemp); 
     }
+    
     function send(action, val = '') {
-      const url = `URL_BACKEND?room=101&action=${action}&value=${val}`;
+      const url = "URL_BACKEND?room=101&action=" + action + "&value=" + val;
       fetch(url, { mode: 'no-cors' });
+    }
+
+    function sendComment() {
+      const msg = document.getElementById('comment').value;
+      if(!msg) return;
+      
+      send('comment', encodeURIComponent(msg));
+      
+      // ป้อปอัพขึ้นบรรทัดใหม่ตามสั่งค่ะ
+      alert("ทุกคำติดชมของท่านจะถูกอ่านโดยเจ้าของโรงแรมเพียงผู้เดียว เพื่อนำไปพัฒนาระบบให้ดีขึ้นอย่างรวดเร็วที่สุด\nขอบคุณที่สละเวลา🙏\n\nEvery feedback of yours will be read by the hotel owner only, to improve our system as quickly as possible.\nThank you for your time.🙏");
+      
+      document.getElementById('comment').value = ''; 
     }
   </script>
 </body>
