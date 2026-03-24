@@ -92,7 +92,6 @@ async function loadData() {
         const res = await fetch(`${API_URL}?action=getPrice`);
         const data = await res.json();
         
-        // เก็บ PIN จากช่อง I1 (Index 7) มาถือไว้ในเครื่อง
         correctPass = data.pw ? data.pw.toString() : "";
         
         const body = document.getElementById("bookingBody");
@@ -152,10 +151,22 @@ async function updatePrice(mode) {
 }
 
 async function openDoor() {
-    const result = await Swal.fire({ title: 'เปิดประตู?', showCancelButton: true, background: '#111', color: '#fff' });
+    const gasShellyUrl = 'https://script.google.com/macros/s/AKfycby2kRZKz42RRffRd1SNeeLxI9Y-D8yDTlc7_3oXX7dXsQMdd5DFRlUkz8iBf-KEfxB9/exec';
+    const result = await Swal.fire({ 
+        title: 'เปิดประตู?', 
+        showCancelButton: true, 
+        background: '#111', 
+        color: '#fff',
+        confirmButtonColor: '#400',
+        cancelButtonColor: '#222',
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก'
+    });
+
     if (result.isConfirmed) {
-        fetch(`${API_URL}?action=openDoor`, { mode: 'no-cors' });
-        Swal.fire({ title: 'สั่งการสำเร็จ', icon: 'success', timer: 1500, showConfirmButton: false, background: '#111', color: '#fff' });
+        // ยิงคำสั่งไปหา Shelly.gs โดยใช้ POST เพื่อความชัวร์
+        fetch(gasShellyUrl, { method: 'POST', mode: 'no-cors' });
+        Swal.fire({ title: 'สั่งการสำเร็จ (แต๊ก!)', icon: 'success', timer: 1500, showConfirmButton: false, background: '#111', color: '#fff' });
     }
 }
 document.addEventListener('DOMContentLoaded', loadData);
