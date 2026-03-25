@@ -66,12 +66,21 @@
     </div>
   </div>
 
+  <label>Bath Lighting</label>
+  <div class="control-card">
+    <div class="display-box"><input type="color" class="color-picker" value="#ffc0cb" onchange="send('bathColor', this.value)"></div>
+    <div class="power-group" style="width: 145px;">
+      <button class="power-btn" style="background: #fff; color: #000;" onclick="send('bathOn')">ON</button>
+      <button class="power-btn" style="background: #222; color: #666; border: 1px solid #444;" onclick="send('bathOff')">OFF</button>
+    </div>
+  </div>
+
   <label>Suggestions (คำติชม)</label>
   <textarea id="comment" class="comment-area" rows="3" placeholder="Write your feedback here..."></textarea>
   <button class="btn btn-send" onclick="sendComment()">SEND FEEDBACK</button>
 
   <script>
-    // เชื่อมต่อ Web App URL ตัวจบของพี่อ้น (fOsp)
+    // URL Web App ล่าสุดของพี่อ้น
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykfk7s6y7wGU0pcIt8HioHQnBKG_SMReQxps5otDGKfskmpwj1hdQo2oqaavX1fOsp/exec";
 
     let currentTemp = 25;
@@ -80,12 +89,11 @@
       if(currentTemp < 18) currentTemp = 18;
       if(currentTemp > 30) currentTemp = 30;
       document.getElementById('temp').innerText = currentTemp;
-      // ส่งคำสั่งปรับแอร์ห้อง 201
       send('airSet', currentTemp); 
     }
     
     function send(action, val = '') {
-      // ส่งค่า room=201 ไปด้วยเพื่อให้ Apps Script รู้ว่าห้องไหนสั่งมา
+      // ส่งค่า room=201 ไปด้วยเพื่อความเป๊ะ
       const url = APPS_SCRIPT_URL + "?room=201&action=" + action + "&value=" + val;
       fetch(url, { mode: 'no-cors' }).catch(err => console.log("Error:", err));
     }
