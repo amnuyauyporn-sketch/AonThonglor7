@@ -59,11 +59,11 @@
 
   <label>Bed Lighting</label>
   <div class="control-card">
-    <div class="display-box"><input type="color" class="color-picker" value="#e0b0ff" onchange="send('bedColor', this.value)"></div>
-    <div class="center-ctrl"><input type="range" class="slider-v" min="1" max="100" value="80" orient="vertical" onchange="send('bedBri', this.value)"></div>
+    <div class="display-box"><input type="color" class="color-picker" value="#e0b0ff" onchange="send('color', this.value.replace('#',''))"></div>
+    <div class="center-ctrl"><input type="range" class="slider-v" min="1" max="100" value="80" orient="vertical" onchange="send('bright', this.value * 10)"></div>
     <div class="power-group">
-      <button class="power-btn" style="background: #fff; color: #000;" onclick="send('bedOn')">ON</button>
-      <button class="power-btn" style="background: #222; color: #666; border: 1px solid #444;" onclick="send('bedOff')">OFF</button>
+      <button class="power-btn" style="background: #fff; color: #000;" onclick="send('on')">ON</button>
+      <button class="power-btn" style="background: #222; color: #666; border: 1px solid #444;" onclick="send('off')">OFF</button>
     </div>
   </div>
 
@@ -82,8 +82,8 @@
   <button class="btn btn-send" onclick="sendComment()">SEND FEEDBACK</button>
 
   <script>
-    // URL Web App ล่าสุดของพี่อ้น (ตัวจบ fOsp)
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykfk7s6y7wGU0pcIt8HioHQnBKG_SMReQxps5otDGKfskmpwj1hdQo2oqaavX1fOsp/exec";
+    // ใช้ URL Web App ที่พี่อ้นส่งมาล่าสุด
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAnNOd097Ey6zAhx-bmk9vpZFtJ2j-nXCexwq5_TbK2txF9WuKQhHz3pPAlx9HWQ/exec";
 
     let currentTemp = 25;
     function changeTemp(val) {
@@ -95,8 +95,7 @@
     }
     
     function send(action, val = '') {
-      // แก้ไข URL ให้ส่งไปหา Web App ของพี่อ้นโดยตรง
-      const url = APPS_SCRIPT_URL + "?room=101&action=" + action + "&value=" + val;
+      const url = APPS_SCRIPT_URL + "?action=" + action + "&value=" + val;
       fetch(url, { mode: 'no-cors' });
     }
 
@@ -106,7 +105,6 @@
       
       send('comment', encodeURIComponent(msg));
       
-      // ป้อปอัพขึ้นบรรทัดใหม่ตามสั่งค่ะ
       alert("ทุกคำติดชมของท่านจะถูกอ่านโดยเจ้าของโรงแรมเพียงผู้เดียว เพื่อนำไปพัฒนาระบบให้ดีขึ้นอย่างรวดเร็วที่สุด\nขอบคุณที่สละเวลา🙏\n\nEvery feedback of yours will be read by the hotel owner only, to improve our system as quickly as possible.\nThank you for your time.🙏");
       
       document.getElementById('comment').value = ''; 
