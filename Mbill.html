@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Thonglor 7 - Monthly Admin</title>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    body { margin:0; font-family:-apple-system,sans-serif; background:#000; color:#fff; padding: 10px; }
+    .container { max-width: 500px; margin: 0 auto; }
+    .door-btn { width:100%; height:70px; background:#400; color:#fff; font-size:20px; font-weight:bold; border:2px solid #600; border-radius:15px; cursor:pointer; margin-bottom: 20px; }
+    .room-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #111; gap: 8px; }
+    
+    .room-side { display: flex; flex-direction: column; align-items: center; min-width: 55px; gap: 5px; }
+    .room-label { font-size: 22px; font-weight: bold; color: #fff; }
+    .btn-edit { background: #222; color: #888; border: none; border-radius: 4px; font-size: 10px; padding: 3px 8px; cursor: pointer; }
+
+    .info-stack { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+    .top-info { font-size: 11px; color: #888; }
+    .due-date { color: #d4a017; margin-left: 5px; font-weight: bold; }
+    
+    .last-meter { font-size: 16px; font-weight: bold; color: #fff; }
+    .unit-tag { color: #06C755; font-size: 12px; margin-right: 5px; font-weight: normal; }
+    .last-meter span { color: #444; font-size: 11px; margin-right: 2px; font-weight: normal; }
+
+    .bottom-info { font-size: 11px; color: #555; }
+    .bottom-info span { color: #333; margin-right: 3px; }
+
+    .now-input { width: 65px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 12px 0; color: #06C755; font-size: 18px; font-weight: bold; text-align: center; outline: none; }
+    .total-box { width: 85px; font-size: 18px; font-weight: bold; text-align: center; color: #888; }
+    
+    .btn-qr { width: 50px; height: 55px; background: #fff; color: #000; border: none; border-radius: 12px; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .btn-paid { width: 50px; height: 55px; background: #1a1a1a; color: #06C755; border: 1px solid #06C755; border-radius: 12px; font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .paid-done { background: #06C755 !important; color: #fff !important; }
+</style>
+</head>
+<body>
+<div class="container">
+    <button class="door-btn" onclick="openDoor()">OPEN FRONT DOOR</button>
+    <div id="roomList"></div>
+</div>
+
+<script>
+let rooms = [
+    {no:'101', price:4500, water:150, last:1020, unit:10, due:"05", now: "", paid: ""},
+    {no:'102', price:4500, water:150, last:1150, unit:10, due:"05", now: "", paid: ""},
+    {no:'201', price:4500, water:150, last:1280, unit:10, due:"05", now: "", paid: ""},
+    {no:'202', price:4500, water:150, last:1340, unit:10, due:"05", now: "", paid: ""},
+    {no:'301', price:4500, water:150, last:1410, unit:10, due:"05", now: "", paid: ""},
+    {no:'302', price:4500, water:150, last:1590, unit:10, due:"05", now: "", paid: ""},
+    {no:'401', price:4500, water:150, last:1620, unit:10, due:"05", now: "", paid: ""},
+    {no:'402', price:4500, water:150, last:1780, unit:10, due:"05", now: "", paid: ""}
+];
+
+function renderRooms() {
+    const listContainer = document.getElementById('roomList');
+    listContainer.innerHTML = rooms.map(r => `
+        <div class="room-row">
+            <div class="room-side">
+                <div class="room-label">${r.no}</div>
+                <button class="btn-edit" onclick="editRoom('${r.no}')">แก้ไข</button>
+            </div>
+            <div class="info-stack">
+                <div class="top-info"><span>ห้อง</span>${r.price}<span class="due-date">ครบ:${r.due}</span></div>
+                <div class="last-meter"><span class="unit-tag">@${r.unit}฿</span><span>เก่า</span>${r.last}</div>
+                <div class="bottom-info">
+                    <span>น้ำ</span>${r.water} ${r.paid ? '<span style="color:#06C755">✓ '+r.paid+'</span>' : ''}
+                </div>
+            </div>
+            <input type="number" class="now-input" id="now-${r.no}" value="${r.now}" placeholder="0000" oninput="handleInput('${r.no}')">
+            <div class="total-box" id="total-${r.no}">-</div>
+            <button class="btn-qr" onclick="goQR('${r.no}')">🧾</button>
+            <button class="btn-paid ${r.paid ? 'paid-done' : ''}" onclick="markPaid('${r.no}')">${r.paid ? 'จ่ายแล้ว' : 'ค้าง'}</button>
+        </div>
+    `).join('');
+}
+
+function handleInput(roomNo) {
+    const r = rooms.find(item => item.no === roomNo);
+    const input = document.getElementById(`now-${roomNo}`);
+    const totalDisp = document.getElementById(`total-${roomNo}`);
+    if (input.value.length > 4) input.value = input.value.slice(0, 4);
+    r.now = input.value;
+    if (input.value.length === 4) {
+        const now = parseInt(input.value);
+        if (now >= r.last) {
+            const total = r.price + r.water + ((now - r.last) * r.unit);
+            totalDisp.innerText = total.toLocaleString();
+            totalDisp.style.color = "#fff";
+        }
+    } else { totalDisp.innerText = "-"; totalDisp.style.color = "#888"; }
+}
+
+async function markPaid(roomNo) {
+    const r = rooms.find(item => item.no === roomNo);
+    const today = new Date();
+    const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear() + 543}`;
+
+    const { isConfirmed } = await Swal.fire({
+        title: `ยืนยันจ่ายเงินห้อง ${roomNo}`,
+        text: `บันทึกวันที่: ${dateStr}`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยัน',
+        cancelButtonText: 'ยกเลิก',
+        background: '#111', color: '#fff',
+        confirmButtonColor: '#06C755',
+        cancelButtonColor: '#444'
+    });
+
+    if (isConfirmed) {
+        r.paid = dateStr;
+        await fetch(config.API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'markPaid', roomNo: roomNo, paidDate: dateStr })
+        });
+        renderRooms();
+    }
+}
+
+async function editRoom(roomNo) {
+    const r = rooms.find(item => item.no === roomNo);
+    const { value: formValues, isDismissed } = await Swal.fire({
+        title: `แก้ไขข้อมูลห้อง ${roomNo}`,
+        background: '#111', color: '#fff',
+        html:
+            `<label style="font-size:12px;color:#888">ราคาค่าเช่าห้อง</label><input id="swal-price" class="swal2-input" type="number" value="${r.price}">` +
+            `<label style="font-size:12px;color:#888">ราคาไฟต่อหน่วย</label><input id="swal-unit" class="swal2-input" type="number" value="${r.unit}">` +
+            `<label style="font-size:12px;color:#888">วันที่ครบกำหนด (เลข 2 หลัก)</label><input id="swal-due" class="swal2-input" type="number" value="${r.due}" maxlength="2">` +
+            `<label style="font-size:12px;color:#888">ค่าน้ำเหมาจ่าย</label><input id="swal-water" class="swal2-input" type="number" value="${r.water}">`,
+        showCancelButton: true,
+        confirmButtonText: 'บันทึก',
+        cancelButtonText: 'ยกเลิก',
+        background: '#111', color: '#fff',
+        confirmButtonColor: '#06C755',
+        cancelButtonColor: '#444',
+        preConfirm: () => {
+            return {
+                price: parseInt(document.getElementById('swal-price').value),
+                unit: parseInt(document.getElementById('swal-unit').value),
+                due: document.getElementById('swal-due').value.toString().padStart(2, '0'),
+                water: parseInt(document.getElementById('swal-water').value)
+            }
+        }
+    });
+    if (formValues && !isDismissed) {
+        Object.assign(r, formValues);
+        await fetch(config.API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateConfig', roomNo: roomNo, ...formValues }) });
+        renderRooms();
+        if (r.now.length === 4) handleInput(roomNo);
+    }
+}
+
+function goQR(roomNo) {
+    const total = document.getElementById(`total-${roomNo}`).innerText;
+    if(total === "-") return;
+    window.location.href = `bill.html?room=${roomNo}&total=${total.replace(/,/g, '')}`;
+}
+
+async function openDoor() {
+    const gasUrl = 'https://script.google.com/macros/s/AKfycby2kRZKz42RRffRd1SNeeLxI9Y-D8yDTlc7_3oXX7dXsQMdd5DFRlUkz8iBf-KEfxB9/exec';
+    fetch(gasUrl, { method: 'POST', mode: 'no-cors' });
+    Swal.fire({ title: 'แต๊ก!', icon: 'success', timer: 800, showConfirmButton: false, background: '#111' });
+}
+
+renderRooms();
+</script>
+</body>
+</html>
